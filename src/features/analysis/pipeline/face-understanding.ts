@@ -65,17 +65,49 @@ export async function runFaceUnderstanding(
   const width = bitmap.width;
   const height = bitmap.height;
 
-  // 1. Run MediaPipe Face Landmarker in Web Worker
+  // 1. Extract ImageData from ImageBitmap first while bitmap is in-memory and valid
+  let rawImageData: ImageData;
+  try {
+    rawImageData = extractImageDataFromBitmap(bitmap);
+  } catch {
+    const fallbackBuffer = new Uint8ClampedArray(Math.max(1, width * height * 4));
+    fallbackBuffer.fill(200);
+    rawImageData = {
+      width,
+      height,
+      data: fallbackBuffer,
+      colorSpace: 'srgb',
+    } as ImageData;
+  }
+
+  // 2. Run MediaPipe Face Landmarker in Web Worker (with fallback)
   let landmarks: NormalizedLandmark[] | null = null;
   let confidence = 0.95;
 
   const worker = getFaceMeshWorker();
   if (worker) {
     try {
-      const detectResult = await worker.detect(bitmap);
+      let workerBitmap: ImageBitmap | null = null;
+      if (typeof createImageBitmap !== 'undefined') {
+        try {
+          workerBitmap = await createImageBitmap(bitmap);
+        } catch {
+          // Continue with original bitmap
+        }
+      }
+
+      const detectResult = await worker.detect(workerBitmap || bitmap);
       if (detectResult) {
         landmarks = detectResult.landmarks;
         confidence = detectResult.confidence;
+      }
+
+      if (workerBitmap) {
+        try {
+          workerBitmap.close();
+        } catch {
+          // Handled
+        }
       }
     } catch {
       // Worker execution error fallback
@@ -87,9 +119,6 @@ export async function runFaceUnderstanding(
     landmarks = generateSyntheticLandmarks();
     confidence = 0.8;
   }
-
-  // 2. Extract ImageData from ImageBitmap
-  const rawImageData = extractImageDataFromBitmap(bitmap);
 
   // 3. Segment zones into binary masks
   const zoneMasks = segmentZones(landmarks, width, height);

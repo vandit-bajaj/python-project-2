@@ -38,8 +38,15 @@ export function BeforeAfterSlider({
     if (!rawCtx || !hmCtx) return;
 
     if (faceBitmap) {
-      rawCtx.drawImage(faceBitmap, 0, 0);
-      hmCtx.drawImage(faceBitmap, 0, 0);
+      try {
+        rawCtx.drawImage(faceBitmap, 0, 0);
+        hmCtx.drawImage(faceBitmap, 0, 0);
+      } catch {
+        rawCtx.fillStyle = '#1e293b';
+        rawCtx.fillRect(0, 0, width, height);
+        hmCtx.fillStyle = '#1e293b';
+        hmCtx.fillRect(0, 0, width, height);
+      }
     } else {
       rawCtx.fillStyle = '#1e293b';
       rawCtx.fillRect(0, 0, width, height);

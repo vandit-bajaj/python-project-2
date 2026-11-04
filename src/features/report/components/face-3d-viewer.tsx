@@ -102,28 +102,32 @@ export function Face3DViewer({
       let texture: THREE.Texture | null = null;
 
       if (faceBitmap) {
-        const texCanvas = document.createElement('canvas');
-        texCanvas.width = faceBitmap.width;
-        texCanvas.height = faceBitmap.height;
-        const ctx = texCanvas.getContext('2d');
-        if (ctx) {
-          ctx.drawImage(faceBitmap, 0, 0);
+        try {
+          const texCanvas = document.createElement('canvas');
+          texCanvas.width = faceBitmap.width;
+          texCanvas.height = faceBitmap.height;
+          const ctx = texCanvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(faceBitmap, 0, 0);
 
-          // If heatmap mode enabled, blend heatmap onto texture
-          if (showHeatmapTexture && report.metrics[activeMetric]) {
-            const heatmapData = report.metrics[activeMetric].heatmap;
-            const heatmapImg = createHeatmapImageData(heatmapData, faceBitmap.width, faceBitmap.height);
-            const hmCanvas = document.createElement('canvas');
-            hmCanvas.width = faceBitmap.width;
-            hmCanvas.height = faceBitmap.height;
-            hmCanvas.getContext('2d')?.putImageData(heatmapImg, 0, 0);
+            // If heatmap mode enabled, blend heatmap onto texture
+            if (showHeatmapTexture && report.metrics[activeMetric]) {
+              const heatmapData = report.metrics[activeMetric].heatmap;
+              const heatmapImg = createHeatmapImageData(heatmapData, faceBitmap.width, faceBitmap.height);
+              const hmCanvas = document.createElement('canvas');
+              hmCanvas.width = faceBitmap.width;
+              hmCanvas.height = faceBitmap.height;
+              hmCanvas.getContext('2d')?.putImageData(heatmapImg, 0, 0);
 
-            ctx.globalAlpha = 0.65;
-            ctx.drawImage(hmCanvas, 0, 0);
+              ctx.globalAlpha = 0.65;
+              ctx.drawImage(hmCanvas, 0, 0);
+            }
+
+            texture = new THREE.CanvasTexture(texCanvas);
+            texture.colorSpace = THREE.SRGBColorSpace;
           }
-
-          texture = new THREE.CanvasTexture(texCanvas);
-          texture.colorSpace = THREE.SRGBColorSpace;
+        } catch {
+          // Handled if bitmap is detached
         }
       }
 

@@ -46,6 +46,8 @@ export function CaptureContainer({ onCaptureComplete, className }: CaptureContai
 
   const handleConfirm = useCallback(
     (capture: ProcessedCapture) => {
+      // Clear internal reference to transfer ownership of ImageBitmap to parent caller
+      setActiveCapture(null);
       if (onCaptureComplete) {
         onCaptureComplete(capture);
       }

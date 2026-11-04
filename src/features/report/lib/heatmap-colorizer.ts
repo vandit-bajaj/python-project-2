@@ -48,7 +48,9 @@ export function createHeatmapImageData(
   width: number,
   height: number,
 ): ImageData {
-  const pixelCount = width * height;
+  const safeWidth = Math.max(1, width || 1);
+  const safeHeight = Math.max(1, height || 1);
+  const pixelCount = safeWidth * safeHeight;
   const rgba = new Uint8ClampedArray(pixelCount * 4);
 
   for (let i = 0; i < pixelCount; i++) {
@@ -62,11 +64,11 @@ export function createHeatmapImageData(
   }
 
   if (typeof ImageData !== 'undefined') {
-    return new ImageData(rgba, width, height);
+    return new ImageData(rgba, safeWidth, safeHeight);
   }
   return {
-    width,
-    height,
+    width: safeWidth,
+    height: safeHeight,
     data: rgba,
     colorSpace: 'srgb',
   } as ImageData;

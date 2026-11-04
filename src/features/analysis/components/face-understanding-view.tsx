@@ -52,11 +52,15 @@ export function FaceUnderstandingView({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    canvas.width = bitmap.width;
-    canvas.height = bitmap.height;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.drawImage(bitmap, 0, 0);
+    try {
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(bitmap, 0, 0);
+      }
+    } catch {
+      // In-memory bitmap may have been closed or detached
     }
   }, [bitmap]);
 

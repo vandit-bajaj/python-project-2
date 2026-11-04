@@ -27,11 +27,21 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
     if (!canvas) return;
 
     if (faceBitmap) {
-      canvas.width = faceBitmap.width;
-      canvas.height = faceBitmap.height;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(faceBitmap, 0, 0);
+      try {
+        canvas.width = faceBitmap.width;
+        canvas.height = faceBitmap.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.drawImage(faceBitmap, 0, 0);
+        }
+      } catch {
+        canvas.width = 400;
+        canvas.height = 500;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+          ctx.fillStyle = '#1e293b';
+          ctx.fillRect(0, 0, 400, 500);
+        }
       }
     } else {
       // If bitmap was detached or released, render placeholder canvas
@@ -50,8 +60,8 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
     const canvas = heatmapCanvasRef.current;
     if (!canvas || !activeMetricData) return;
 
-    const width = faceBitmap?.width ?? 400;
-    const height = faceBitmap?.height ?? 500;
+    const width = faceBitmap && faceBitmap.width > 0 ? faceBitmap.width : 400;
+    const height = faceBitmap && faceBitmap.height > 0 ? faceBitmap.height : 500;
 
     canvas.width = width;
     canvas.height = height;

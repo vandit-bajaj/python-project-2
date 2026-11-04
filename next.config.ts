@@ -6,7 +6,7 @@ const isDev = process.env.NODE_ENV !== 'production';
 // Note: In development, Next.js / React requires eval for hot reloading.
 const cspHeader = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' ${isDev ? "'unsafe-eval'" : ''};
+  script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' ${isDev ? "'unsafe-eval'" : ''};
   worker-src 'self' blob:;
   style-src 'self' 'unsafe-inline';
   img-src 'self' blob: data:;
