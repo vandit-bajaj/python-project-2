@@ -3,24 +3,25 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/shared/lib/utils';
 
 export const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]',
+  'inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] select-none',
   {
     variants: {
       variant: {
-        default: 'bg-teal-600 text-white shadow hover:bg-teal-700',
+        default:
+          'bg-[var(--primary)] text-white shadow-sm hover:opacity-95 active:opacity-90',
         secondary:
-          'bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700',
+          'border border-[var(--border)] bg-[var(--card)] text-[var(--foreground)] hover:bg-[var(--muted)]',
         outline:
-          'border border-slate-200 bg-transparent hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800',
+          'border border-[var(--border)] bg-transparent text-[var(--foreground)] hover:bg-[var(--muted)]',
         ghost:
-          'hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-slate-100',
-        link: 'text-teal-600 underline-offset-4 hover:underline dark:text-teal-400',
+          'hover:bg-[var(--muted)] hover:text-[var(--foreground)] text-[var(--muted-foreground)]',
+        link: 'text-[var(--primary)] underline-offset-4 hover:underline',
       },
       size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-8 rounded-md px-3 text-xs',
-        lg: 'h-11 rounded-md px-8 text-base',
-        icon: 'h-10 w-10',
+        default: 'h-10 min-h-[44px] px-5 py-2',
+        sm: 'h-8 min-h-[36px] rounded-lg px-3.5 text-xs',
+        lg: 'h-11 min-h-[44px] rounded-xl px-7 text-base font-semibold',
+        icon: 'h-10 w-10 min-h-[44px] min-w-[44px] rounded-xl',
       },
     },
     defaultVariants: {

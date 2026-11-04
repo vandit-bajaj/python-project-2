@@ -237,6 +237,7 @@ export function normalizeLightingAndBaseline(
       baselineLightness: Math.round(meanL * 10) / 10,
       baselineRedness: Math.round(meanA * 10) / 10,
       baselineMelanin: Math.round(meanMelanin * 100) / 100,
+      ita: Math.round(ita * 10) / 10,
     },
   };
 }

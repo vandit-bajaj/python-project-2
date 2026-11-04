@@ -71,6 +71,8 @@ export interface SkinToneBaseline {
   baselineRedness: number;
   /** Baseline melanin index */
   baselineMelanin: number;
+  /** Individual Typology Angle (ITA) in degrees */
+  ita?: number;
 }
 
 // Zod Schema for persisted or exported report validation

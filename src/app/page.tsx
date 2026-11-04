@@ -1,60 +1,94 @@
 import Link from 'next/link';
 import { Button } from '@/shared/ui/button';
-import { ShieldCheck, EyeOff, Sparkles, AlertCircle } from 'lucide-react';
+import { ShieldCheck, EyeOff, Sparkles, Camera, Upload, Scale } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
-      {/* Wellness Disclaimer Badge */}
-      <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-teal-500/20 bg-teal-500/10 px-3.5 py-1.5 text-xs font-medium text-teal-700 dark:text-teal-300">
-        <AlertCircle className="h-4 w-4" />
-        <span>Skin-Wellness Insights &bull; Not a Medical Diagnosis</span>
+    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-24">
+      {/* Centered Editorial Hero Section */}
+      <div className="text-center">
+        {/* Eyebrow Badges */}
+        <div className="inline-flex flex-wrap items-center justify-center gap-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-500/20 bg-teal-500/10 px-3.5 py-1 text-xs font-medium text-teal-800 dark:text-teal-300">
+            <Sparkles className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
+            <span>100% On-Device Facial Wellness Analysis • No Cloud Uploads</span>
+          </div>
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1 text-xs font-medium text-[var(--muted-foreground)]">
+            <span>Skin-Wellness Insights • Not a Medical Diagnosis</span>
+          </div>
+        </div>
+
+        {/* Editorial Headline */}
+        <h1 className="mt-8 text-4xl font-extrabold tracking-tight sm:text-6xl text-[var(--foreground)]">
+          Private skin wellness intelligence.
+          <br className="hidden sm:inline" />
+          <span className="text-teal-700 dark:text-teal-400"> Directly in your browser.</span>
+        </h1>
+
+        {/* Subtext */}
+        <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[var(--muted-foreground)] sm:text-lg">
+          Clinical-grade computer vision assessing erythema, texture, sebum balance, and pigment
+          clarity. Zero latency, zero data egress.
+        </p>
+
+        {/* Clear Interactive CTA Group */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <Link href="/scan">
+            <Button size="lg" className="gap-2.5">
+              <Camera className="h-4 w-4" />
+              Start Live Scan
+            </Button>
+          </Link>
+          <Link href="/scan">
+            <Button variant="secondary" size="lg" className="gap-2.5">
+              <Upload className="h-4 w-4" />
+              Upload Photo
+            </Button>
+          </Link>
+          <Link href="/disclaimer">
+            <Button variant="ghost" size="lg">
+              Read Disclaimer
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      <h1 className="text-4xl font-extrabold tracking-tight sm:text-6xl">
-        Private, in-browser facial skin analytics.
-      </h1>
-
-      <p className="mt-6 text-lg leading-8 text-[var(--muted-foreground)] sm:text-xl">
-        Analyze redness, texture, oiliness, and hydration indicators using client-side computer
-        vision. Zero uploads, zero servers, 100% on-device privacy.
-      </p>
-
-      <div className="mt-10 flex flex-wrap items-center gap-4">
-        <Link href="/scan">
-          <Button size="lg" className="gap-2">
-            <Sparkles className="h-4 w-4" />
-            Launch Scanner
-          </Button>
-        </Link>
-        <Link href="/disclaimer">
-          <Button variant="outline" size="lg">
-            Read Disclaimer
-          </Button>
-        </Link>
-      </div>
-
-      {/* Privacy Guarantees Grid */}
-      <div className="mt-20 grid grid-cols-1 gap-8 border-t border-[var(--border)] pt-12 sm:grid-cols-2">
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-600/10 text-teal-600">
+      {/* 3 Refined Value Cards */}
+      <div className="mt-24 grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-xs transition-shadow hover:shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600/10 text-teal-700 dark:text-teal-400">
             <EyeOff className="h-5 w-5" />
           </div>
-          <h3 className="mt-4 text-base font-semibold">Zero Image Egress</h3>
-          <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-            Your camera feed and photos are held in transient memory (`ImageBitmap`) only. They are
-            never sent across the network or stored in external databases.
+          <h3 className="mt-4 text-base font-semibold text-[var(--foreground)]">Strict Zero-Egress</h3>
+          <p className="mt-2 text-xs leading-relaxed text-[var(--muted-foreground)]">
+            Facial imagery is processed in volatile device memory and immediately discarded. No
+            remote servers, no cloud storage, zero tracking.
           </p>
         </div>
 
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-sm">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-600/10 text-teal-600">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-xs transition-shadow hover:shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600/10 text-teal-700 dark:text-teal-400">
+            <Scale className="h-5 w-5" />
+          </div>
+          <h3 className="mt-4 text-base font-semibold text-[var(--foreground)]">
+            Personal Baseline Calibration
+          </h3>
+          <p className="mt-2 text-xs leading-relaxed text-[var(--muted-foreground)]">
+            Metrics adapt to your personal skin phototype using individual typology angle (ITA)
+            modeling across all Fitzpatrick scales I–VI.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-xs transition-shadow hover:shadow-sm">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600/10 text-teal-700 dark:text-teal-400">
             <ShieldCheck className="h-5 w-5" />
           </div>
-          <h3 className="mt-4 text-base font-semibold">Transparent Confidence</h3>
-          <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-            Every attribute score includes confidence metrics calibrated for diverse skin tones,
-            acknowledging low-signal conditions honestly.
+          <h3 className="mt-4 text-base font-semibold text-[var(--foreground)]">
+            Non-Diagnostic Transparency
+          </h3>
+          <p className="mt-2 text-xs leading-relaxed text-[var(--muted-foreground)]">
+            Clear wellness insights paired with empirical confidence ratings, never exaggerated
+            precision or false medical claims.
           </p>
         </div>
       </div>

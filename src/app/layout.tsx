@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f8fafc' },
-    { media: '(prefers-color-scheme: dark)', color: '#090d16' },
+    { media: '(prefers-color-scheme: light)', color: '#fafaf9' },
+    { media: '(prefers-color-scheme: dark)', color: '#090a0f' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -27,18 +27,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="flex min-h-screen flex-col bg-[var(--background)] text-[var(--foreground)] antialiased">
-        <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-md">
+        <header className="sticky top-0 z-50 border-b border-[var(--border)] bg-[var(--background)]/85 backdrop-blur-md">
           <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-teal-600 font-bold text-white shadow-sm">
+            <Link href="/" className="flex items-center gap-2.5 text-base font-bold tracking-tight">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal-800 dark:bg-teal-500 font-bold text-white dark:text-black shadow-xs">
                 DL
               </span>
               <span>DermaLens</span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm font-medium">
+            <nav className="flex items-center gap-5 text-xs font-semibold">
               <Link
                 href="/scan"
-                className="text-[var(--foreground)] transition-colors hover:text-teal-600"
+                className="text-[var(--foreground)] transition-colors hover:text-teal-700 dark:hover:text-teal-400"
               >
                 Scan
               </Link>
