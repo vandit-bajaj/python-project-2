@@ -104,7 +104,7 @@ npm run typecheck
 # Run ESLint (strict no-any & React 19 rules)
 npm run lint
 
-# Run all 62 Vitest unit tests (deterministic fixture-based tests)
+# Run all 70 Vitest unit tests (deterministic fixture-based tests)
 npm run test:run
 
 # Run Playwright E2E and network privacy tests (asserts 0 external requests)
@@ -195,6 +195,7 @@ All core engineering decisions are permanently recorded in [`docs/decisions/`](d
 - **ADR-004**: Classical Computer Vision Heuristics & Skin-Tone Calibration
 - **ADR-005**: 3D Face Geometry, Perceptual Heatmaps & Local PDF Reporting
 - **ADR-006**: Production Security Headers, Offline PWA & Zero-Egress Architecture
+- **ADR-007**: Rigorous Inspection Rebuild, Canonical Mesh & Zero-Egress Verification
 
 ---
 
