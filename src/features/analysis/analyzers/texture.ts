@@ -1,6 +1,6 @@
 import type { AnalyzerResult, NormalizedLandmark, SkinToneBaseline } from '@/shared/types';
 import type { ZoneMasks, SkinRoiMasks } from '../types';
-import { extractLuminance, calculatePerZoneAverages } from './utils';
+import { extractLuminance, calculatePerZoneAverages, computeLogisticScore } from './utils';
 
 /**
  * Analyzes skin texture roughness and visible pores using 2D discrete Laplacian filtering.
@@ -52,10 +52,10 @@ export function analyzeTexture(
 
   const meanRoughness = skinPixelCount > 0 ? totalRoughness / skinPixelCount : 0;
 
-  // 100 = silky smooth texture, lower = prominent texture/visible pores
-  const score = Math.round(Math.max(0, Math.min(100, 100 - meanRoughness * 350)));
+  // Calibrated sigmoidal decay: threshold50 = 0.15, gamma = 1.8
+  const score = computeLogisticScore(meanRoughness, 0.15, 1.8);
 
-  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi);
+  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi, 0.15, 1.8);
 
   return {
     score,

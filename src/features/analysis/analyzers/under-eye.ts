@@ -1,6 +1,6 @@
 import type { AnalyzerResult, NormalizedLandmark, SkinToneBaseline } from '@/shared/types';
 import type { ZoneMasks, SkinRoiMasks } from '../types';
-import { extractLuminance, calculatePerZoneAverages } from './utils';
+import { extractLuminance, calculatePerZoneAverages, computeLogisticScore } from './utils';
 
 /**
  * Analyzes under-eye darkness and periorbital hyperpigmentation
@@ -54,8 +54,9 @@ export function analyzeUnderEye(
       const currentLum = lum[i] ?? 0;
       const darknessDeficit = cheekBaselineLum - currentLum;
 
-      if (darknessDeficit > 4) {
-        const intensity = Math.min(1.0, (darknessDeficit - 4) / 40);
+      // Measure darkness deficit beyond natural anatomical socket depth (threshold = 14)
+      if (darknessDeficit > 14) {
+        const intensity = Math.min(1.0, (darknessDeficit - 14) / 45);
         heatmap[i] = intensity * (skinRoi.softMask[i] ?? 1);
         totalDarkness += intensity;
       }
@@ -64,10 +65,11 @@ export function analyzeUnderEye(
 
   const meanDarkness = underEyePixelCount > 0 ? totalDarkness / underEyePixelCount : 0;
 
-  // 100 = bright, well-rested under-eye zone, lower = deeper dark circles
-  const score = Math.round(Math.max(0, Math.min(100, 100 - meanDarkness * 280)));
+  // Calibrated sigmoidal decay: threshold50 = 0.48, gamma = 1.6
+  // Mild dark circles score 65-78, moderate 50-60, severe <35
+  const score = computeLogisticScore(meanDarkness, 0.48, 1.6);
 
-  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi);
+  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi, 0.48, 1.6);
 
   return {
     score,

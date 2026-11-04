@@ -21,61 +21,59 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
 
   const activeMetricData = report.metrics[selectedMetric];
 
+  // Canonical dimensions from report prevent buffer stride mismatch
+  const canonicalWidth = report.imageWidth || (faceBitmap && faceBitmap.width > 0 ? faceBitmap.width : 400);
+  const canonicalHeight = report.imageHeight || (faceBitmap && faceBitmap.height > 0 ? faceBitmap.height : 500);
+
   // Draw face photo to base canvas
   useEffect(() => {
     const canvas = baseCanvasRef.current;
     if (!canvas) return;
 
+    canvas.width = canonicalWidth;
+    canvas.height = canonicalHeight;
+
     if (faceBitmap) {
       try {
-        canvas.width = faceBitmap.width;
-        canvas.height = faceBitmap.height;
         const ctx = canvas.getContext('2d');
         if (ctx) {
-          ctx.drawImage(faceBitmap, 0, 0);
+          ctx.drawImage(faceBitmap, 0, 0, canonicalWidth, canonicalHeight);
         }
       } catch {
-        canvas.width = 400;
-        canvas.height = 500;
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.fillStyle = '#1e293b';
-          ctx.fillRect(0, 0, 400, 500);
+          ctx.fillRect(0, 0, canonicalWidth, canonicalHeight);
         }
       }
     } else {
       // If bitmap was detached or released, render placeholder canvas
-      canvas.width = 400;
-      canvas.height = 500;
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.fillStyle = '#1e293b';
-        ctx.fillRect(0, 0, 400, 500);
+        ctx.fillRect(0, 0, canonicalWidth, canonicalHeight);
       }
     }
-  }, [faceBitmap]);
+  }, [faceBitmap, canonicalWidth, canonicalHeight]);
 
   // Render heatmap overlay when selected metric changes
   useEffect(() => {
     const canvas = heatmapCanvasRef.current;
     if (!canvas || !activeMetricData) return;
 
-    const width = faceBitmap && faceBitmap.width > 0 ? faceBitmap.width : 400;
-    const height = faceBitmap && faceBitmap.height > 0 ? faceBitmap.height : 500;
-
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = canonicalWidth;
+    canvas.height = canonicalHeight;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    ctx.clearRect(0, 0, width, height);
+    ctx.clearRect(0, 0, canonicalWidth, canonicalHeight);
 
     if (activeMetricData.heatmap) {
-      const imgData = createHeatmapImageData(activeMetricData.heatmap, width, height);
+      const imgData = createHeatmapImageData(activeMetricData.heatmap, canonicalWidth, canonicalHeight);
       ctx.putImageData(imgData, 0, 0);
     }
-  }, [activeMetricData, faceBitmap]);
+  }, [activeMetricData, canonicalWidth, canonicalHeight]);
 
   return (
     <div className={`space-y-4 ${className}`}>

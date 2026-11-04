@@ -14,12 +14,40 @@ export function createEmptyZoneScores(defaultValue = 100): Record<ZoneId, number
 }
 
 /**
- * Calculates per-zone average intensity from a full-face heatmap or metric buffer.
+ * Non-linear sigmoidal / logistic transfer function to convert observed physical defect
+ * intensities into perceptual skin wellness scores (0 - 100).
+ * Prevents linear subtraction collapse (0 / 100 bipolar states) and models true
+ * dermatological perceptual gradations.
+ *
+ * Formula: score = round(100 / (1 + (intensity / threshold50)^gamma))
+ *
+ * @param intensity Observed defect intensity or deviation (>= 0)
+ * @param threshold50 Intensity corresponding to a moderate 50/100 score
+ * @param gamma Steepness / sensitivity exponent (default: 1.8)
+ */
+export function computeLogisticScore(
+  intensity: number,
+  threshold50: number,
+  gamma = 1.8,
+): number {
+  if (intensity <= 0) return 100;
+  if (threshold50 <= 0) return 50;
+
+  const ratio = intensity / threshold50;
+  const score = 100 / (1 + Math.pow(ratio, gamma));
+  return Math.round(Math.max(0, Math.min(100, score)));
+}
+
+/**
+ * Calculates per-zone wellness scores from a full-face heatmap or metric buffer
+ * using calibrated sigmoidal transfer scaling.
  */
 export function calculatePerZoneAverages(
   heatmap: Float32Array,
   zoneMasks: ZoneMasks,
   skinRoi: SkinRoiMasks,
+  threshold50 = 0.22,
+  gamma = 1.8,
 ): Record<ZoneId, number> {
   const zoneScores = createEmptyZoneScores(100);
 
@@ -41,9 +69,8 @@ export function calculatePerZoneAverages(
     }
 
     if (validCount > 0) {
-      // Average intensity in zone (0.0 to 1.0) -> scaled to 0-100 wellness score
       const meanIntensity = sum / validCount;
-      zoneScores[zoneId] = Math.round(Math.max(0, Math.min(100, 100 - meanIntensity * 250)));
+      zoneScores[zoneId] = computeLogisticScore(meanIntensity, threshold50, gamma);
     }
   }
 

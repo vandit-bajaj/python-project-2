@@ -1,7 +1,7 @@
 import type { AnalyzerResult, NormalizedLandmark, SkinToneBaseline } from '@/shared/types';
 import type { ZoneMasks, SkinRoiMasks } from '../types';
 import { rgbToLab } from '../lib/lighting-normalizer';
-import { calculatePerZoneAverages, computeBaseConfidence } from './utils';
+import { calculatePerZoneAverages, computeBaseConfidence, computeLogisticScore } from './utils';
 
 /**
  * Analyzes facial redness (erythema) relative to user's personal baseline.
@@ -50,10 +50,10 @@ export function analyzeRedness(
 
   const meanDeviation = skinPixelCount > 0 ? totalDeviation / skinPixelCount : 0;
 
-  // 100 = perfectly calm skin, decreasing as erythema/redness increases
-  const score = Math.round(Math.max(0, Math.min(100, 100 - meanDeviation * 250)));
+  // Calibrated sigmoidal decay: threshold50 = 0.22, gamma = 1.8
+  const score = computeLogisticScore(meanDeviation, 0.22, 1.8);
 
-  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi);
+  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi, 0.22, 1.8);
 
   return {
     score,

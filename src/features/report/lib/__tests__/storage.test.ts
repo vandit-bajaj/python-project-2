@@ -11,6 +11,8 @@ describe('Local Report Storage & Memory Purge', () => {
     id: 'scan_test_123',
     timestamp: new Date().toISOString(),
     overallScore: 88,
+    imageWidth: 400,
+    imageHeight: 500,
     baseline: {
       fitzpatrickScale: 2,
       baselineLightness: 70,

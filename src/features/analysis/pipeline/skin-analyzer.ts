@@ -99,6 +99,8 @@ export function runComprehensiveSkinAnalysis(
     id,
     timestamp: new Date().toISOString(),
     overallScore,
+    imageWidth: normalizedImageData.width,
+    imageHeight: normalizedImageData.height,
     baseline,
     metrics: metrics as Record<MetricId, MetricScoreSummary>,
     confidence: avgConfidence,

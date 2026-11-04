@@ -1,6 +1,6 @@
 import type { AnalyzerResult, NormalizedLandmark, SkinToneBaseline } from '@/shared/types';
 import type { ZoneMasks, SkinRoiMasks } from '../types';
-import { boxBlur, calculatePerZoneAverages } from './utils';
+import { boxBlur, calculatePerZoneAverages, computeLogisticScore } from './utils';
 
 /**
  * Analyzes localized hyperpigmentation, dark spots, and sun spots.
@@ -68,10 +68,10 @@ export function analyzePigmentation(
   // Confidence is high across tones because contrast is relative to local background
   const confidence = baseline.fitzpatrickScale >= 5 ? 0.88 : 0.92;
 
-  // 100 = uniform pigment distribution, lower = prominent localized spotting
-  const score = Math.round(Math.max(0, Math.min(100, 100 - meanPigmentContrast * 400)));
+  // Calibrated sigmoidal decay: threshold50 = 0.12, gamma = 1.8
+  const score = computeLogisticScore(meanPigmentContrast, 0.12, 1.8);
 
-  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi);
+  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi, 0.12, 1.8);
 
   return {
     score,

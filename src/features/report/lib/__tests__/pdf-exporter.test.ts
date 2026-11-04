@@ -36,6 +36,8 @@ describe('PDF Report Exporter', () => {
       id: 'scan_pdf_test_999',
       timestamp: new Date().toISOString(),
       overallScore: 82,
+      imageWidth: 400,
+      imageHeight: 500,
       baseline: {
         fitzpatrickScale: 3,
         baselineLightness: 65,

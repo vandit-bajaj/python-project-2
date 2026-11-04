@@ -1,6 +1,6 @@
 import type { AnalyzerResult, NormalizedLandmark, SkinToneBaseline } from '@/shared/types';
 import type { ZoneMasks, SkinRoiMasks } from '../types';
-import { extractLuminance, calculatePerZoneAverages } from './utils';
+import { extractLuminance, calculatePerZoneAverages, computeLogisticScore } from './utils';
 
 /**
  * Analyzes overall skin tone evenness and spatial uniformity.
@@ -65,8 +65,8 @@ export function analyzeEvenness(
       const diffColor = (Math.abs(r - meanR) + Math.abs(g - meanG) + Math.abs(b - meanB)) / 3;
       const combinedDiff = 0.5 * diffL + 0.5 * diffColor;
 
-      if (combinedDiff > 8) {
-        const intensity = Math.min(1.0, (combinedDiff - 8) / 35);
+      if (combinedDiff > 20) {
+        const intensity = Math.min(1.0, (combinedDiff - 20) / 45);
         heatmap[i] = intensity * (skinRoi.softMask[i] ?? 1);
         totalDeviation += intensity;
       }
@@ -75,10 +75,10 @@ export function analyzeEvenness(
 
   const meanDeviation = totalDeviation / skinPixelCount;
 
-  // 100 = perfectly uniform complexion, lower = high spatial blotchiness/unevenness
-  const score = Math.round(Math.max(0, Math.min(100, 100 - meanDeviation * 240)));
+  // Calibrated sigmoidal decay: threshold50 = 0.45, gamma = 1.6
+  const score = computeLogisticScore(meanDeviation, 0.45, 1.6);
 
-  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi);
+  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi, 0.45, 1.6);
 
   return {
     score,

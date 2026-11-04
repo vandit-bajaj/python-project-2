@@ -1,6 +1,6 @@
 import type { AnalyzerResult, NormalizedLandmark, SkinToneBaseline } from '@/shared/types';
 import type { ZoneMasks, SkinRoiMasks } from '../types';
-import { boxBlur, calculatePerZoneAverages } from './utils';
+import { boxBlur, calculatePerZoneAverages, computeLogisticScore } from './utils';
 
 /**
  * Analyzes acne, blemishes, and localized breakouts.
@@ -56,9 +56,9 @@ export function analyzeAcne(
     if (skinRoi.binaryMask[i] === 255) {
       const dog = (blurNarrow[i] ?? 0) - (blurWide[i] ?? 0);
 
-      // Threshold for distinct blemish/papule response
-      if (dog > 4.0) {
-        const intensity = Math.min(1.0, (dog - 4.0) / 25.0);
+      // Threshold for distinct focal blemish/papule response (filter background pore noise)
+      if (dog > 5.5) {
+        const intensity = Math.min(1.0, (dog - 5.5) / 25.0);
         heatmap[i] = intensity * (skinRoi.softMask[i] ?? 1);
         totalBlemishIntensity += intensity;
         blemishClusterPixels++;
@@ -69,13 +69,13 @@ export function analyzeAcne(
   // Estimate lesion density and severity per thousand skin pixels
   const blemishDensity = skinPixelCount > 0 ? (blemishClusterPixels / skinPixelCount) * 1000 : 0;
   const blemishSeverity = skinPixelCount > 0 ? (totalBlemishIntensity / skinPixelCount) * 1000 : 0;
+  const aggregateBlemishIndex = blemishDensity * 0.4 + blemishSeverity * 0.6;
 
-  // 100 = completely clear, decreasing with blemish density and severity
-  const score = Math.round(
-    Math.max(0, Math.min(100, 100 - (blemishDensity * 8 + blemishSeverity * 12))),
-  );
+  // Calibrated sigmoidal decay: threshold50 = 12.0, gamma = 1.7
+  // Clean skin scores 85-95, moderate breakouts 50-65, severe acne <35
+  const score = computeLogisticScore(aggregateBlemishIndex, 12.0, 1.7);
 
-  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi);
+  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi, 0.18, 1.8);
 
   return {
     score,

@@ -1,6 +1,6 @@
 import type { AnalyzerResult, NormalizedLandmark, SkinToneBaseline } from '@/shared/types';
 import type { ZoneMasks, SkinRoiMasks } from '../types';
-import { extractLuminance, calculatePerZoneAverages } from './utils';
+import { extractLuminance, calculatePerZoneAverages, computeLogisticScore } from './utils';
 
 /**
  * Analyzes fine lines and facial creases using directional Sobel gradient filtering.
@@ -59,10 +59,10 @@ export function analyzeFineLines(
 
   const meanLineDensity = skinPixelCount > 0 ? totalLineIntensity / skinPixelCount : 0;
 
-  // 100 = youthful, crease-free, lower = prominent lines
-  const score = Math.round(Math.max(0, Math.min(100, 100 - meanLineDensity * 320)));
+  // Calibrated sigmoidal decay: threshold50 = 0.14, gamma = 1.8
+  const score = computeLogisticScore(meanLineDensity, 0.14, 1.8);
 
-  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi);
+  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi, 0.14, 1.8);
 
   return {
     score,

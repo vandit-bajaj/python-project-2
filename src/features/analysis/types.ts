@@ -48,6 +48,8 @@ export interface ComprehensiveSkinReport {
   id: string;
   timestamp: string;
   overallScore: number;
+  imageWidth: number;
+  imageHeight: number;
   baseline: SkinToneBaseline;
   metrics: Record<MetricId, MetricScoreSummary>;
   confidence: number;

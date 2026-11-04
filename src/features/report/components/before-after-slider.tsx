@@ -25,8 +25,8 @@ export function BeforeAfterSlider({
     const hmCanvas = heatmapCanvasRef.current;
     if (!rawCanvas || !hmCanvas) return;
 
-    const width = faceBitmap && faceBitmap.width > 0 ? faceBitmap.width : 400;
-    const height = faceBitmap && faceBitmap.height > 0 ? faceBitmap.height : 500;
+    const width = report.imageWidth || (faceBitmap && faceBitmap.width > 0 ? faceBitmap.width : 400);
+    const height = report.imageHeight || (faceBitmap && faceBitmap.height > 0 ? faceBitmap.height : 500);
 
     rawCanvas.width = width;
     rawCanvas.height = height;

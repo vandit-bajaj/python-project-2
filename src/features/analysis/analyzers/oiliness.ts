@@ -1,6 +1,6 @@
 import type { AnalyzerResult, NormalizedLandmark, SkinToneBaseline } from '@/shared/types';
 import type { ZoneMasks, SkinRoiMasks } from '../types';
-import { calculatePerZoneAverages } from './utils';
+import { calculatePerZoneAverages, computeLogisticScore } from './utils';
 
 /**
  * Analyzes skin surface oiliness and sebum shine via specular highlight reflection.
@@ -57,10 +57,11 @@ export function analyzeOiliness(
   // Weighted shine index with 60% weight on T-zone
   const aggregateShine = 0.6 * tZoneShineRatio + 0.4 * globalShineRatio;
 
-  // 100 = balanced matte/satin finish, decreasing as oily specular shine increases
-  const score = Math.round(Math.max(0, Math.min(100, 100 - aggregateShine * 600)));
+  // Calibrated sigmoidal decay: threshold50 = 0.08, gamma = 1.8
+  // Natural satin finish scores 80-92, moderate T-zone shine 50-65, heavy oiliness <35
+  const score = computeLogisticScore(aggregateShine, 0.08, 1.8);
 
-  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi);
+  const perZone = calculatePerZoneAverages(heatmap, zoneMasks, skinRoi, 0.08, 1.8);
 
   return {
     score,

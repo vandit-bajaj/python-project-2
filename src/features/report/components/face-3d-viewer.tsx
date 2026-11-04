@@ -101,22 +101,25 @@ export function Face3DViewer({
       // 3. Create textures
       let texture: THREE.Texture | null = null;
 
+      const texWidth = report.imageWidth || (faceBitmap?.width ?? 400);
+      const texHeight = report.imageHeight || (faceBitmap?.height ?? 500);
+
       if (faceBitmap) {
         try {
           const texCanvas = document.createElement('canvas');
-          texCanvas.width = faceBitmap.width;
-          texCanvas.height = faceBitmap.height;
+          texCanvas.width = texWidth;
+          texCanvas.height = texHeight;
           const ctx = texCanvas.getContext('2d');
           if (ctx) {
-            ctx.drawImage(faceBitmap, 0, 0);
+            ctx.drawImage(faceBitmap, 0, 0, texWidth, texHeight);
 
             // If heatmap mode enabled, blend heatmap onto texture
             if (showHeatmapTexture && report.metrics[activeMetric]) {
               const heatmapData = report.metrics[activeMetric].heatmap;
-              const heatmapImg = createHeatmapImageData(heatmapData, faceBitmap.width, faceBitmap.height);
+              const heatmapImg = createHeatmapImageData(heatmapData, texWidth, texHeight);
               const hmCanvas = document.createElement('canvas');
-              hmCanvas.width = faceBitmap.width;
-              hmCanvas.height = faceBitmap.height;
+              hmCanvas.width = texWidth;
+              hmCanvas.height = texHeight;
               hmCanvas.getContext('2d')?.putImageData(heatmapImg, 0, 0);
 
               ctx.globalAlpha = 0.65;
