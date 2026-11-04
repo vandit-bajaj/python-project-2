@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Link from 'next/link';
+import { ServiceWorkerRegister } from '@/shared/ui/sw-register';
 
 export const metadata: Metadata = {
   title: 'DermaLens — Privacy-First Skin Wellness Analysis',
@@ -52,6 +53,7 @@ export default function RootLayout({
         </header>
 
         <main className="flex-1">{children}</main>
+        <ServiceWorkerRegister />
 
         <footer className="border-t border-[var(--border)] bg-[var(--background)] py-8 text-center text-xs text-[var(--muted-foreground)]">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
