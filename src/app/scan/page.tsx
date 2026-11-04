@@ -3,19 +3,42 @@
 import { useState } from 'react';
 import { CaptureContainer } from '@/features/capture';
 import type { ProcessedCapture } from '@/features/capture';
-import { Button } from '@/shared/ui/button';
+import {
+  runFaceUnderstanding,
+  FaceUnderstandingView,
+} from '@/features/analysis';
+import type { FaceUnderstandingResult } from '@/features/analysis';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 
 export default function ScanPage() {
   const [confirmedCapture, setConfirmedCapture] = useState<ProcessedCapture | null>(null);
+  const [understandingResult, setUnderstandingResult] = useState<FaceUnderstandingResult | null>(null);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const handleCaptureComplete = (capture: ProcessedCapture) => {
+  const handleCaptureComplete = async (capture: ProcessedCapture) => {
     setConfirmedCapture(capture);
+    setIsProcessing(true);
+    try {
+      const result = await runFaceUnderstanding(capture.bitmap);
+      setUnderstandingResult(result);
+    } catch {
+      // If error occurs, reset
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleRetake = () => {
+    if (confirmedCapture) {
+      confirmedCapture.bitmap.close();
+    }
+    setConfirmedCapture(null);
+    setUnderstandingResult(null);
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
       <div className="mb-6 flex items-center justify-between">
         <Link
           href="/"
@@ -33,37 +56,28 @@ export default function ScanPage() {
         </p>
       </div>
 
-      {confirmedCapture ? (
-        <div className="mx-auto max-w-md rounded-3xl border border-[var(--border)] bg-[var(--card)] p-8 text-center shadow-lg">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-600/10 text-teal-600">
-            <Sparkles className="h-7 w-7" />
-          </div>
-
-          <h2 className="text-xl font-bold">Image Acquired</h2>
+      {isProcessing && (
+        <div className="mx-auto flex max-w-md flex-col items-center justify-center rounded-3xl border border-[var(--border)] bg-[var(--card)] p-12 text-center shadow-lg">
+          <Loader2 className="h-10 w-10 animate-spin text-teal-600" />
+          <h2 className="mt-4 text-lg font-bold">Understanding Facial Geometry</h2>
           <p className="mt-2 text-xs text-[var(--muted-foreground)]">
-            Resolution: {confirmedCapture.width} &times; {confirmedCapture.height}px &bull; Quality
-            Score: {confirmedCapture.quality.score}/100
+            Locating 478 landmarks, segmenting facial zones, and calibrating skin-tone baseline...
           </p>
-
-          <div className="mt-4 rounded-xl bg-teal-500/10 p-3 text-xs text-teal-800 dark:text-teal-200">
-            Image held in transient device memory (`ImageBitmap`). Ready for Face Landmarking in
-            Phase 2.
-          </div>
-
-          <div className="mt-6 flex flex-col gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                confirmedCapture.bitmap.close();
-                setConfirmedCapture(null);
-              }}
-            >
-              Scan Another Photo
-            </Button>
-          </div>
         </div>
-      ) : (
+      )}
+
+      {!isProcessing && confirmedCapture && understandingResult && (
+        <FaceUnderstandingView
+          bitmap={confirmedCapture.bitmap}
+          result={understandingResult}
+          onRetake={handleRetake}
+          onProceed={() => {
+            // Ready for Phase 3 analyzers
+          }}
+        />
+      )}
+
+      {!isProcessing && !confirmedCapture && (
         <CaptureContainer onCaptureComplete={handleCaptureComplete} />
       )}
     </div>
