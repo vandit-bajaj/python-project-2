@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: ['phase-*/**', 'main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  hygiene-and-secrets:
+    name: Repository Hygiene & Secret Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify No Face Images or Credentials Committed
+        run: |
+          echo "Scanning for forbidden image formats in tracked files..."
+          FORBIDDEN_FILES=$(git ls-files | grep -iE '\.(jpg|jpeg|png|webp|heic|avif|bmp|raw|tiff)$' | grep -v 'public/favicon' || true)
+          if [ -n "$FORBIDDEN_FILES" ]; then
+            echo "ERROR: User or test face images detected in git tracking:"
+            echo "$FORBIDDEN_FILES"
+            exit 1
+          fi
+          echo "Scanning for .env or credential leaks..."
+          ENV_FILES=$(git ls-files | grep -iE '(^\.env|\.pem$|\.key$|\.cert$)' || true)
+          if [ -n "$ENV_FILES" ]; then
+            echo "ERROR: Environment or key files detected in git tracking:"
+            echo "$ENV_FILES"
+            exit 1
+          fi
+          echo "Hygiene scan passed: zero sensitive files committed."
+
+  typecheck-and-lint:
+    name: Typecheck & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+
+  test-unit:
+    name: Unit & Integration Tests (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run test:run
+
+  test-e2e:
+    name: E2E Smoke & Privacy Check (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: 'npm'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:e2e
