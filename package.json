@@ -15,13 +15,16 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
+    "prepare": "node scripts/prepare-artifacts.mjs",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@mediapipe/tasks-vision": "^1.2.2",
     "@tailwindcss/postcss": "^4.3.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "comlink": "^4.4.2",
     "lucide-react": "^1.68.0",
     "motion": "^14.9.1",
     "next": "16.4.5",

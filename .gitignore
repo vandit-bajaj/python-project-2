@@ -38,6 +38,13 @@ storybook-static/
 !public/favicon.ico
 !public/icon.svg
 
+# Self-hosted binary runtime caches (restored automatically by prepare-artifacts.mjs)
+public/wasm/*.wasm
+public/wasm/*.js
+public/models/*.task
+!public/wasm/.gitkeep
+!public/models/.gitkeep
+
 # Testing & Quality outputs
 coverage/
 *.lcov

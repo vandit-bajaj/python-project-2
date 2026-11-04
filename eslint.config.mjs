@@ -28,6 +28,7 @@ const config = [
       'node_modules/**',
       'coverage/**',
       'dist/**',
+      'public/**',
       'storybook-static/**',
       'test-results/**',
       'playwright-report/**',
