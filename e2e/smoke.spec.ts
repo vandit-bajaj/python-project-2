@@ -37,6 +37,6 @@ test.describe('DermaLens Smoke & Privacy Tests', () => {
 
   test('scanner route is accessible from navigation', async ({ page }) => {
     await page.goto('/scan');
-    await expect(page.getByRole('heading', { name: /Skin Wellness Capture/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Facial Wellness Scan/i })).toBeVisible();
   });
 });

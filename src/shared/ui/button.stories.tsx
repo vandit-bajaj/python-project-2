@@ -44,4 +44,3 @@ export const Outline: Story = {
     variant: 'outline',
   },
 };
-

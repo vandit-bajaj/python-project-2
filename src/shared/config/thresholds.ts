@@ -20,4 +20,3 @@ export const CONFIDENCE_LEVELS = {
   MEDIUM: 0.65,
   LOW: 0.45,
 } as const;
-

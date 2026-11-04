@@ -79,4 +79,3 @@ export const AnalyzerResultSchema = z.object({
   perZone: z.record(z.string(), z.number().min(0).max(100)),
   confidence: z.number().min(0).max(1),
 });
-
