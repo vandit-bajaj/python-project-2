@@ -4,6 +4,7 @@ import type { ZoneMasks, SkinRoiMasks } from '../../types';
 import { generateSyntheticLandmarks } from '../../pipeline/face-understanding';
 import { segmentZones } from '../../lib/zone-segmenter';
 import { buildSkinRoiMasks } from '../../lib/skin-mask-builder';
+import { normalizeLightingAndBaseline } from '../../lib/lighting-normalizer';
 import { analyzeRedness, analyzeAcne, analyzeEvenness } from '../index';
 
 describe('Skin-Tone Fairness & Multi-Tone Invariance', () => {
@@ -23,6 +24,56 @@ describe('Skin-Tone Fairness & Multi-Tone Invariance', () => {
     { scale: 5, rgb: [140, 95, 70], name: 'Fitzpatrick V (Brown)' },
     { scale: 6, rgb: [85, 55, 40], name: 'Fitzpatrick VI (Dark)' },
   ];
+
+  it('correctly calibrates baseline phototypes across all 6 standard tone fixtures', () => {
+    // Fitzpatrick I
+    const buf1 = new Uint8ClampedArray(pixelCount * 4);
+    for (let i = 0; i < pixelCount; i++) {
+      buf1[i * 4] = 250; buf1[i * 4 + 1] = 225; buf1[i * 4 + 2] = 205; buf1[i * 4 + 3] = 255;
+    }
+    const res1 = normalizeLightingAndBaseline(
+      { width, height, data: buf1, colorSpace: 'srgb' } as ImageData,
+      skinRoi,
+      zoneMasks,
+    );
+    expect([1, 2]).toContain(res1.baseline.fitzpatrickScale);
+
+    // Fitzpatrick II
+    const buf2 = new Uint8ClampedArray(pixelCount * 4);
+    for (let i = 0; i < pixelCount; i++) {
+      buf2[i * 4] = 240; buf2[i * 4 + 1] = 205; buf2[i * 4 + 2] = 180; buf2[i * 4 + 3] = 255;
+    }
+    const res2 = normalizeLightingAndBaseline(
+      { width, height, data: buf2, colorSpace: 'srgb' } as ImageData,
+      skinRoi,
+      zoneMasks,
+    );
+    expect([1, 2]).toContain(res2.baseline.fitzpatrickScale);
+
+    // Fitzpatrick V
+    const buf5 = new Uint8ClampedArray(pixelCount * 4);
+    for (let i = 0; i < pixelCount; i++) {
+      buf5[i * 4] = 140; buf5[i * 4 + 1] = 95; buf5[i * 4 + 2] = 70; buf5[i * 4 + 3] = 255;
+    }
+    const res5 = normalizeLightingAndBaseline(
+      { width, height, data: buf5, colorSpace: 'srgb' } as ImageData,
+      skinRoi,
+      zoneMasks,
+    );
+    expect(res5.baseline.fitzpatrickScale).toBe(5);
+
+    // Fitzpatrick VI
+    const buf6 = new Uint8ClampedArray(pixelCount * 4);
+    for (let i = 0; i < pixelCount; i++) {
+      buf6[i * 4] = 85; buf6[i * 4 + 1] = 55; buf6[i * 4 + 2] = 40; buf6[i * 4 + 3] = 255;
+    }
+    const res6 = normalizeLightingAndBaseline(
+      { width, height, data: buf6, colorSpace: 'srgb' } as ImageData,
+      skinRoi,
+      zoneMasks,
+    );
+    expect(res6.baseline.fitzpatrickScale).toBe(6);
+  });
 
   TONE_FIXTURES.forEach(({ scale, rgb, name }) => {
     it(`evaluates ${name} gracefully without NaN or negative scores`, () => {

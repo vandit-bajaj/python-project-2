@@ -1,6 +1,60 @@
 import { describe, it, expect } from 'vitest';
 import { getZonePolygon, rasterizePolygon, segmentZones } from '../zone-segmenter';
-import { generateSyntheticLandmarks } from '../../pipeline/face-understanding';
+import { ZONE_LANDMARK_MAP } from '../landmarks-definitions';
+import type { ZoneId, NormalizedLandmark } from '@/shared/types';
+import canonicalLandmarksRaw from '../fixtures/canonical-landmarks.json';
+
+const canonicalLandmarks = canonicalLandmarksRaw as NormalizedLandmark[];
+
+function ccw(A: { x: number; y: number }, B: { x: number; y: number }, C: { x: number; y: number }) {
+  return (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
+}
+
+function segmentsIntersect(
+  A: { x: number; y: number },
+  B: { x: number; y: number },
+  C: { x: number; y: number },
+  D: { x: number; y: number },
+) {
+  if (
+    (A.x === C.x && A.y === C.y) ||
+    (A.x === D.x && A.y === D.y) ||
+    (B.x === C.x && B.y === C.y) ||
+    (B.x === D.x && B.y === D.y)
+  ) {
+    return false;
+  }
+  return ccw(A, C, D) !== ccw(B, C, D) && ccw(A, B, C) !== ccw(A, B, D);
+}
+
+function countSelfIntersections(pts: { x: number; y: number }[]): number {
+  const n = pts.length;
+  let intersections = 0;
+  for (let i = 0; i < n; i++) {
+    const p1 = pts[i]!;
+    const p2 = pts[(i + 1) % n]!;
+    for (let j = i + 2; j < n; j++) {
+      if (i === 0 && j === n - 1) continue; // adjacent
+      const p3 = pts[j]!;
+      const p4 = pts[(j + 1) % n]!;
+      if (segmentsIntersect(p1, p2, p3, p4)) {
+        intersections++;
+      }
+    }
+  }
+  return intersections;
+}
+
+function computeSignedArea(pts: { x: number; y: number }[]): number {
+  let area = 0;
+  const n = pts.length;
+  for (let i = 0; i < n; i++) {
+    const p1 = pts[i]!;
+    const p2 = pts[(i + 1) % n]!;
+    area += p1.x * p2.y - p2.x * p1.y;
+  }
+  return area / 2;
+}
 
 describe('Zone Segmenter', () => {
   it('correctly maps normalized landmarks to pixel coordinates', () => {
@@ -39,12 +93,35 @@ describe('Zone Segmenter', () => {
     expect(mask[19 * width + 19]).toBe(0);
   });
 
-  it('segments all 7 facial zones without errors on synthetic face landmarks', () => {
-    const landmarks = generateSyntheticLandmarks();
+  it('validates all 9 zone polygons have zero self-intersections and positive area on canonical face', () => {
+    const zoneEntries = Object.entries(ZONE_LANDMARK_MAP) as [ZoneId, readonly number[]][];
+
+    for (const [zoneId, indices] of zoneEntries) {
+      // Remove trailing closure point if duplicated
+      const cleanIndices = [...indices];
+      if (cleanIndices.length > 2 && cleanIndices[0] === cleanIndices[cleanIndices.length - 1]) {
+        cleanIndices.pop();
+      }
+
+      const pts = cleanIndices.map((idx) => {
+        const lm = canonicalLandmarks[idx];
+        if (!lm) throw new Error(`Missing landmark at index ${idx}`);
+        return { x: lm.x, y: lm.y };
+      });
+
+      const intersections = countSelfIntersections(pts);
+      expect(intersections, `Zone ${zoneId} should have 0 self-intersections`).toBe(0);
+
+      const area = Math.abs(computeSignedArea(pts));
+      expect(area, `Zone ${zoneId} should have positive non-zero area`).toBeGreaterThan(0.001);
+    }
+  });
+
+  it('segments all 9 facial zones without errors on canonical and synthetic landmarks', () => {
     const width = 120;
     const height = 120;
 
-    const zones = segmentZones(landmarks, width, height);
+    const zones = segmentZones(canonicalLandmarks, width, height);
 
     expect(zones.forehead).toBeDefined();
     expect(zones.leftCheek).toBeDefined();
@@ -56,13 +133,11 @@ describe('Zone Segmenter', () => {
     expect(zones.underEyeRight).toBeDefined();
     expect(zones.jawline).toBeDefined();
 
-    // Verify all zone masks have correct dimensions
     for (const [zoneId, zoneData] of Object.entries(zones)) {
       expect(zoneData.width).toBe(width);
       expect(zoneData.height).toBe(height);
       expect(zoneData.mask.length).toBe(width * height);
 
-      // Verify that at least some pixels are segmented
       const filledCount = zoneData.mask.filter((val) => val === 255).length;
       expect(filledCount, `Zone ${zoneId} should have filled pixels`).toBeGreaterThan(0);
     }

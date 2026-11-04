@@ -6,6 +6,8 @@ import { buildSkinRoiMasks } from '../lib/skin-mask-builder';
 import { normalizeLightingAndBaseline } from '../lib/lighting-normalizer';
 import { extractImageDataFromBitmap } from '@/features/capture/lib/image-processor';
 
+import canonicalLandmarksRaw from '../lib/fixtures/canonical-landmarks.json';
+
 interface FaceMeshWorkerInterface {
   init(): Promise<boolean>;
   detect(bitmap: ImageBitmap): Promise<FaceMeshResult | null>;
@@ -50,24 +52,10 @@ export interface FaceUnderstandingOptions {
 }
 
 /**
- * Creates canonical synthetic face landmarks (478 points) for testing fixtures.
+ * Returns canonical anatomical face landmarks (478 points) for testing fixtures.
  */
 export function generateSyntheticLandmarks(): NormalizedLandmark[] {
-  const landmarks: NormalizedLandmark[] = [];
-  for (let i = 0; i < 478; i++) {
-    // Generate centered oval coordinates around center (0.5, 0.5)
-    const angle = (i / 478) * 2 * Math.PI;
-    const rX = 0.25 + 0.05 * Math.cos(angle * 3);
-    const rY = 0.35 + 0.05 * Math.sin(angle * 2);
-
-    landmarks.push({
-      x: 0.5 + rX * Math.cos(angle),
-      y: 0.5 + rY * Math.sin(angle),
-      z: 0.0,
-      visibility: 0.99,
-    });
-  }
-  return landmarks;
+  return (canonicalLandmarksRaw as NormalizedLandmark[]).map((lm) => ({ ...lm }));
 }
 
 /**
@@ -167,10 +155,11 @@ export async function runFaceUnderstanding(
   // 4. Build skin ROI masks excluding eyes, lips, and brows
   const skinRoi = buildSkinRoiMasks(landmarks, width, height);
 
-  // 5. White-balance normalization and baseline calibration
+  // 5. White-balance normalization and baseline calibration using central facial zones
   const { normalizedImageData, baseline } = normalizeLightingAndBaseline(
     rawImageData,
     skinRoi,
+    zoneMasks,
   );
 
   return {

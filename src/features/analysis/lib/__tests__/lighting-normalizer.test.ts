@@ -80,4 +80,67 @@ describe('Lighting Normalizer & Skin Tone Baseline', () => {
     expect(Math.abs(result1.baseline.fitzpatrickScale - result2.baseline.fitzpatrickScale)).toBeLessThanOrEqual(1);
     expect(result2.baseline.baselineRedness).toBeGreaterThan(0);
   });
+
+  it('safeguards fair skin against false Type V/VI classification under shadowed conditions', () => {
+    // Fair Caucasian RGB values (R=215, G=175, B=145) under simulated directional shadow where local L* is low
+    // Negative or near-zero ITA angle should be protected by physiological safeguard
+    const safeType = mapITAToFitzpatrick(-5, 215, 175, 145);
+    expect(safeType).toBeLessThanOrEqual(3);
+    expect(safeType).toBeGreaterThanOrEqual(2);
+  });
+
+  it('samples central cheek and forehead zones when zoneMasks are provided', () => {
+    const width = 20;
+    const height = 20;
+    const pixelCount = width * height;
+
+    const binaryMask = new Uint8ClampedArray(pixelCount).fill(255);
+    const skinRoi: SkinRoiMasks = {
+      width,
+      height,
+      binaryMask,
+      softMask: new Float32Array(pixelCount),
+    };
+
+    // Buffer where outer perimeter is dark (hair shadow: R=30, G=20, B=15)
+    // but central cheek is fair (R=235, G=195, B=165)
+    const buffer = new Uint8ClampedArray(pixelCount * 4);
+    for (let i = 0; i < pixelCount; i++) {
+      buffer[i * 4] = 30;
+      buffer[i * 4 + 1] = 20;
+      buffer[i * 4 + 2] = 15;
+      buffer[i * 4 + 3] = 255;
+    }
+
+    const cheekMask = new Uint8ClampedArray(pixelCount);
+    for (let y = 6; y < 14; y++) {
+      for (let x = 6; x < 14; x++) {
+        const idx = y * width + x;
+        cheekMask[idx] = 255;
+        buffer[idx * 4] = 235;
+        buffer[idx * 4 + 1] = 195;
+        buffer[idx * 4 + 2] = 165;
+      }
+    }
+
+    const emptyMask = new Uint8ClampedArray(pixelCount);
+    const mockZoneMasks = {
+      forehead: { width, height, mask: emptyMask },
+      leftCheek: { width, height, mask: cheekMask },
+      rightCheek: { width, height, mask: emptyMask },
+      nose: { width, height, mask: emptyMask },
+      chin: { width, height, mask: emptyMask },
+      tZone: { width, height, mask: emptyMask },
+      underEyeLeft: { width, height, mask: emptyMask },
+      underEyeRight: { width, height, mask: emptyMask },
+      jawline: { width, height, mask: emptyMask },
+    };
+
+    const imgData = { width, height, data: buffer, colorSpace: 'srgb' as const } as ImageData;
+    const result = normalizeLightingAndBaseline(imgData, skinRoi, mockZoneMasks);
+
+    // Should classify as fair skin (Type I or II), avoiding the dark hair perimeter
+    expect([1, 2]).toContain(result.baseline.fitzpatrickScale);
+    expect(result.baseline.baselineLightness).toBeGreaterThan(60);
+  });
 });

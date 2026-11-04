@@ -53,10 +53,11 @@ describe('Classical CV Skin Analyzers', () => {
 
     it('detects high erythema patches and reduces wellness score', () => {
       const img = createUniformSkinImageData();
-      // Inject strong redness patch (R=255, G=80, B=80) into forehead
+      // Inject strong redness patch (R=255, G=70, B=70) into forehead and cheeks
       const forehead = zoneMasks.forehead.mask;
+      const leftCheek = zoneMasks.leftCheek.mask;
       for (let i = 0; i < pixelCount; i++) {
-        if (forehead[i] === 255 && skinRoi.binaryMask[i] === 255) {
+        if ((forehead[i] === 255 || leftCheek[i] === 255) && skinRoi.binaryMask[i] === 255) {
           img.data[i * 4] = 255;
           img.data[i * 4 + 1] = 70;
           img.data[i * 4 + 2] = 70;
