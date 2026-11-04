@@ -9,8 +9,8 @@ export default function HomePage() {
       <div className="text-center">
         {/* Eyebrow Badges */}
         <div className="inline-flex flex-wrap items-center justify-center gap-2">
-          <div className="inline-flex items-center gap-1.5 rounded-full border border-teal-500/20 bg-teal-500/10 px-3.5 py-1 text-xs font-medium text-teal-800 dark:text-teal-300">
-            <Sparkles className="h-3.5 w-3.5 text-teal-600 dark:text-teal-400" />
+          <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--primary)]/20 bg-[var(--primary)]/10 px-3.5 py-1 text-xs font-medium text-[var(--primary)]">
+            <Sparkles className="h-3.5 w-3.5 text-[var(--primary)]" />
             <span>100% On-Device Facial Wellness Analysis • No Cloud Uploads</span>
           </div>
           <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border)] bg-[var(--card)] px-3 py-1 text-xs font-medium text-[var(--muted-foreground)]">
@@ -22,7 +22,7 @@ export default function HomePage() {
         <h1 className="mt-8 text-4xl font-extrabold tracking-tight sm:text-6xl text-[var(--foreground)]">
           Private skin wellness intelligence.
           <br className="hidden sm:inline" />
-          <span className="text-teal-700 dark:text-teal-400"> Directly in your browser.</span>
+          <span className="text-[var(--primary)]"> Directly in your browser.</span>
         </h1>
 
         {/* Subtext */}
@@ -56,7 +56,7 @@ export default function HomePage() {
       {/* 3 Refined Value Cards */}
       <div className="mt-24 grid grid-cols-1 gap-6 sm:grid-cols-3">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-xs transition-shadow hover:shadow-sm">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600/10 text-teal-700 dark:text-teal-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
             <EyeOff className="h-5 w-5" />
           </div>
           <h3 className="mt-4 text-base font-semibold text-[var(--foreground)]">Strict Zero-Egress</h3>
@@ -67,7 +67,7 @@ export default function HomePage() {
         </div>
 
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-xs transition-shadow hover:shadow-sm">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600/10 text-teal-700 dark:text-teal-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
             <Scale className="h-5 w-5" />
           </div>
           <h3 className="mt-4 text-base font-semibold text-[var(--foreground)]">
@@ -80,7 +80,7 @@ export default function HomePage() {
         </div>
 
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6 shadow-xs transition-shadow hover:shadow-sm">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-teal-600/10 text-teal-700 dark:text-teal-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)]">
             <ShieldCheck className="h-5 w-5" />
           </div>
           <h3 className="mt-4 text-base font-semibold text-[var(--foreground)]">

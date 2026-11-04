@@ -34,7 +34,7 @@ export default function ReportPage({ params }: ReportPageProps) {
   if (loading) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center p-8">
-        <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-[var(--primary)]" />
         <p className="mt-4 text-xs text-[var(--muted-foreground)]">Loading confidential local report...</p>
       </div>
     );
@@ -43,7 +43,7 @@ export default function ReportPage({ params }: ReportPageProps) {
   if (!report) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center sm:py-24">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--warning)]/10 text-[var(--warning)]">
           <FileQuestion className="h-7 w-7" />
         </div>
         <h1 className="mt-4 text-xl font-bold">Report Not Found on Device</h1>
@@ -52,7 +52,7 @@ export default function ReportPage({ params }: ReportPageProps) {
         </p>
         <div className="mt-6 flex justify-center gap-3">
           <Link href="/scan">
-            <Button size="sm" className="bg-teal-600 text-white">Start New Scan</Button>
+            <Button size="sm">Start New Scan</Button>
           </Link>
           <Link href="/">
             <Button size="sm" variant="outline">Home</Button>
@@ -67,7 +67,7 @@ export default function ReportPage({ params }: ReportPageProps) {
       <div className="mb-6">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:text-teal-600"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:text-[var(--primary)]"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Home

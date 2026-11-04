@@ -97,8 +97,8 @@ export function UploadView({ onUpload, className }: UploadViewProps) {
         className={cn(
           'relative mx-auto flex aspect-[3/4] w-full max-w-sm flex-col items-center justify-center rounded-3xl border-2 border-dashed p-8 text-center transition-all duration-200',
           isDragging
-            ? 'scale-[1.01] border-teal-500 bg-teal-500/10'
-            : 'border-[var(--border)] bg-[var(--card)] hover:border-teal-500/40',
+            ? 'scale-[1.01] border-[var(--primary)] bg-[var(--primary)]/10'
+            : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary)]/40',
         )}
       >
         <input
@@ -111,12 +111,12 @@ export function UploadView({ onUpload, className }: UploadViewProps) {
 
         {isProcessing ? (
           <div className="flex flex-col items-center gap-3">
-            <RefreshCw className="h-10 w-10 animate-spin text-teal-600" />
+            <RefreshCw className="h-10 w-10 animate-spin text-[var(--primary)]" />
             <p className="text-sm font-medium">Stripping metadata and normalizing...</p>
           </div>
         ) : (
           <>
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600/10 text-teal-600">
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--primary)]/10 text-[var(--primary)]">
               <UploadCloud className="h-8 w-8" />
             </div>
 
@@ -139,7 +139,7 @@ export function UploadView({ onUpload, className }: UploadViewProps) {
         )}
 
         {errorMessage && (
-          <div className="mt-4 flex items-center gap-2 rounded-lg bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-300">
+          <div className="mt-4 flex items-center gap-2 rounded-lg bg-[var(--danger)]/10 p-3 text-xs text-[var(--danger)]">
             <AlertCircle className="h-4 w-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>

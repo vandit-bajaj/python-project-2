@@ -169,7 +169,7 @@ export function FaceUnderstandingView({
                         onClick={() => setActiveZone(zone.id)}
                         className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
                           isSelected
-                            ? 'bg-teal-600 text-white shadow-sm'
+                            ? 'bg-[var(--primary)] text-[var(--primary-foreground)] shadow-xs'
                             : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:bg-[var(--muted)]/80 hover:text-[var(--foreground)]'
                         }`}
                       >
@@ -190,7 +190,7 @@ export function FaceUnderstandingView({
             {onProceed && (
               <Button
                 size="lg"
-                className="w-full bg-teal-600 font-semibold text-white hover:bg-teal-700 shadow-md"
+                className="w-full font-semibold shadow-md"
                 onClick={onProceed}
               >
                 <Sparkles className="mr-2 h-4 w-4" />

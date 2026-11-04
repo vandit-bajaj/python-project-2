@@ -102,7 +102,7 @@ export default function ScanPage() {
       <div className="mb-6 flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:text-teal-600"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:text-[var(--primary)]"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Home
@@ -111,7 +111,7 @@ export default function ScanPage() {
 
       {isProcessing && (
         <div className="mx-auto flex max-w-md flex-col items-center justify-center rounded-3xl border border-[var(--border)] bg-[var(--card)] p-12 text-center shadow-lg">
-          <Loader2 className="h-10 w-10 animate-spin text-teal-600" />
+          <Loader2 className="h-10 w-10 animate-spin text-[var(--primary)]" />
           <h2 className="mt-4 text-lg font-bold">Analyzing Skin Attributes</h2>
           <p className="mt-2 text-xs text-[var(--muted-foreground)]">{processingStatus}</p>
         </div>
@@ -119,8 +119,8 @@ export default function ScanPage() {
 
       {/* Error state if face detection or analysis fails */}
       {error && !isProcessing && (
-        <div className="mx-auto max-w-md rounded-3xl border border-rose-500/20 bg-rose-500/5 p-8 text-center shadow-md">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400">
+        <div className="mx-auto max-w-md rounded-3xl border border-[var(--danger)]/20 bg-[var(--danger)]/5 p-8 text-center shadow-md">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--danger)]/10 text-[var(--danger)]">
             <AlertCircle className="h-7 w-7" />
           </div>
           <h2 className="text-xl font-bold text-[var(--foreground)]">{error.title}</h2>
@@ -131,7 +131,7 @@ export default function ScanPage() {
             <Button
               size="sm"
               onClick={handleRetake}
-              className="gap-2 bg-teal-600 text-white hover:bg-teal-700"
+              className="gap-2"
             >
               <RefreshCw className="h-4 w-4" />
               Try Another Photo
