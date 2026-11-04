@@ -23,3 +23,4 @@ export function normalizeScore(val: number, min: number, max: number): number {
   const normalized = ((val - min) / (max - min)) * 100;
   return Math.round(clamp(normalized, 0, 100));
 }
+
