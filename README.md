@@ -196,6 +196,7 @@ All core engineering decisions are permanently recorded in [`docs/decisions/`](d
 - **ADR-005**: 3D Face Geometry, Perceptual Heatmaps & Local PDF Reporting
 - **ADR-006**: Production Security Headers, Offline PWA & Zero-Egress Architecture
 - **ADR-007**: Rigorous Inspection Rebuild, Canonical Mesh & Zero-Egress Verification
+- **ADR-008**: Semantic Light Mode, Zero-FOWT CSP Initializer & Print-Friendly PDF Export
 
 ---
 
