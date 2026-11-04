@@ -1,0 +1,67 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.yarn/cache
+
+# Production & Build outputs
+.next/
+out/
+build/
+dist/
+storybook-static/
+
+# Environment files & Secrets (Strict: Never commit credentials)
+.env
+.env*.local
+.env.development
+.env.test
+.env.production
+*.pem
+*.key
+*.cert
+*.pfx
+*.keystore
+
+# Privacy Protection: Ban all face/biometric test photos
+# Only SVG and JSON mock fixtures are permitted in tests
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.heic
+*.avif
+*.bmp
+*.raw
+*.tiff
+# Exception for website favicon only
+!public/favicon.ico
+!public/icon.svg
+
+# Testing & Quality outputs
+coverage/
+*.lcov
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+.lighthouseci/
+
+# Vercel deployment artifacts
+.vercel
+
+# Debug & Cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
