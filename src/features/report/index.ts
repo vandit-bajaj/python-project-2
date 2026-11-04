@@ -1,2 +1,10 @@
-// Report presentation module placeholder (Phase 4)
-export const REPORT_MODULE_INITIALIZED = true;
+export * from './lib/face-triangulation';
+export * from './lib/heatmap-colorizer';
+export * from './lib/pdf-exporter';
+export * from './lib/storage';
+export * from './components/face-3d-viewer';
+export * from './components/heatmap-view';
+export * from './components/zone-radar-chart';
+export * from './components/metric-bar-chart';
+export * from './components/before-after-slider';
+export * from './components/report-dashboard';

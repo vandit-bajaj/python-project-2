@@ -1,35 +1,79 @@
+'use client';
+
+import { useEffect, useState, use } from 'react';
+import type { ComprehensiveSkinReport } from '@/features/analysis/types';
+import { getReportById, ReportDashboard } from '@/features/report';
 import Link from 'next/link';
 import { Button } from '@/shared/ui/button';
-import { FileText } from 'lucide-react';
+import { FileQuestion, Loader2, ArrowLeft } from 'lucide-react';
 
 interface ReportPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function ReportPage({ params }: ReportPageProps) {
-  const { id } = await params;
+export default function ReportPage({ params }: ReportPageProps) {
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
+
+  const [report, setReport] = useState<ComprehensiveSkinReport | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    getReportById(id).then((res) => {
+      if (isMounted) {
+        setReport(res);
+        setLoading(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center p-8">
+        <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+        <p className="mt-4 text-xs text-[var(--muted-foreground)]">Loading confidential local report...</p>
+      </div>
+    );
+  }
+
+  if (!report) {
+    return (
+      <div className="mx-auto max-w-md px-4 py-16 text-center sm:py-24">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-amber-600">
+          <FileQuestion className="h-7 w-7" />
+        </div>
+        <h1 className="mt-4 text-xl font-bold">Report Not Found on Device</h1>
+        <p className="mt-2 text-xs text-[var(--muted-foreground)] leading-relaxed">
+          Because DermaLens operates under a strict Zero-Egress mandate, reports are held solely in your local browser storage and never uploaded to any cloud server.
+        </p>
+        <div className="mt-6 flex justify-center gap-3">
+          <Link href="/scan">
+            <Button size="sm" className="bg-teal-600 text-white">Start New Scan</Button>
+          </Link>
+          <Link href="/">
+            <Button size="sm" variant="outline">Home</Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 sm:py-24">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-600/10 text-teal-600 shadow-sm">
-        <FileText className="h-8 w-8" />
-      </div>
-
-      <h1 className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl">Skin Wellness Report</h1>
-
-      <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-        Report ID: <code className="rounded bg-slate-100 px-1 py-0.5 dark:bg-slate-800">{id}</code>
-      </p>
-
-      <p className="mt-4 text-base text-[var(--muted-foreground)]">
-        Interactive 3D face viewer, heatmaps, and metric cards will render here in Phase 4.
-      </p>
-
-      <div className="mt-8">
-        <Link href="/">
-          <Button variant="outline">Return Home</Button>
+    <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+      <div className="mb-6">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--muted-foreground)] transition-colors hover:text-teal-600"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
         </Link>
       </div>
+      <ReportDashboard report={report} />
     </div>
   );
 }
