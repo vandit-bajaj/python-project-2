@@ -1,3 +1,12 @@
-// Camera & upload capture placeholder (Phase 1)
-export const CAPTURE_SUPPORTED = true;
-
+export * from './types';
+export * from './lib/quality-analyzer';
+export * from './lib/image-processor';
+export * from './hooks/use-camera';
+export * from './hooks/use-quality-gate';
+export * from './components/capture-container';
+export * from './components/camera-view';
+export * from './components/upload-view';
+export * from './components/face-guide-overlay';
+export * from './components/quality-guidance';
+export * from './components/privacy-badge';
+export * from './components/image-preview';
