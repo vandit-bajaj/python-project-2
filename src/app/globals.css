@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 
-:root {
+@custom-variant dark (&:where(.dark, [data-theme=dark], .dark *, [data-theme=dark] *));
+
+:root,
+[data-theme='light'],
+.light {
   --background: #fafaf9;
   --foreground: #18181b;
   --card: #ffffff;
@@ -17,10 +21,36 @@
   --border-active: #d4d4d8;
   --ring: #0f766e;
   --radius: 1rem;
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #b91c1c;
 }
 
+[data-theme='dark'],
+.dark {
+  --background: #090a0f;
+  --foreground: #f4f4f5;
+  --card: #12131a;
+  --card-foreground: #f4f4f5;
+  --subtle: #181924;
+  --primary: #14b8a6;
+  --primary-accent: #2dd4bf;
+  --primary-foreground: #090a0f;
+  --secondary: #181924;
+  --secondary-foreground: #a1a1aa;
+  --muted: #181924;
+  --muted-foreground: #a1a1aa;
+  --border: #232533;
+  --border-active: #2f3245;
+  --ring: #14b8a6;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+}
+
+/* Fallback for initial render before JavaScript execution when system prefers dark */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme='light']):not(.light) {
     --background: #090a0f;
     --foreground: #f4f4f5;
     --card: #12131a;
@@ -36,6 +66,9 @@
     --border: #232533;
     --border-active: #2f3245;
     --ring: #14b8a6;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
   }
 }
 
@@ -55,6 +88,7 @@ body {
   padding: 0;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 150ms ease, color 150ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
