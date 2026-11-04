@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useSyncExternalStore } from 'react';
+import { useState, useEffect, useCallback, useRef, useSyncExternalStore } from 'react';
 import { CameraView } from './camera-view';
 import { UploadView } from './upload-view';
 import { ImagePreview } from './image-preview';
@@ -28,25 +28,37 @@ export function CaptureContainer({ onCaptureComplete, className }: CaptureContai
   const [mode, setMode] = useState<CaptureMode>('camera');
   const [activeCapture, setActiveCapture] = useState<ProcessedCapture | null>(null);
 
+  // Track transfer ownership to parent so unmount does not dispose the confirmed bitmap
+  const isTransferredRef = useRef<boolean>(false);
+  const activeCaptureRef = useRef<ProcessedCapture | null>(null);
+
   const handleCapture = useCallback((capture: ProcessedCapture) => {
+    isTransferredRef.current = false;
     setActiveCapture((prev) => {
       if (prev?.bitmap && prev.bitmap !== capture.bitmap) {
         releaseBitmap(prev.bitmap);
       }
+      activeCaptureRef.current = capture;
       return capture;
     });
   }, []);
 
   const handleRetake = useCallback(() => {
-    if (activeCapture?.bitmap) {
-      releaseBitmap(activeCapture.bitmap);
-    }
-    setActiveCapture(null);
-  }, [activeCapture]);
+    isTransferredRef.current = false;
+    setActiveCapture((prev) => {
+      if (prev?.bitmap) {
+        releaseBitmap(prev.bitmap);
+      }
+      activeCaptureRef.current = null;
+      return null;
+    });
+  }, []);
 
   const handleConfirm = useCallback(
     (capture: ProcessedCapture) => {
-      // Clear internal reference to transfer ownership of ImageBitmap to parent caller
+      // Mark as transferred to prevent unmount cleanup from closing the bitmap
+      isTransferredRef.current = true;
+      activeCaptureRef.current = null;
       setActiveCapture(null);
       if (onCaptureComplete) {
         onCaptureComplete(capture);
@@ -55,14 +67,15 @@ export function CaptureContainer({ onCaptureComplete, className }: CaptureContai
     [onCaptureComplete],
   );
 
-  // Clean up any held in-memory ImageBitmap on component unmount
+  // Clean up any held in-memory ImageBitmap on component unmount ONLY if not transferred
   useEffect(() => {
     return () => {
-      if (activeCapture?.bitmap) {
-        releaseBitmap(activeCapture.bitmap);
+      if (!isTransferredRef.current && activeCaptureRef.current?.bitmap) {
+        releaseBitmap(activeCaptureRef.current.bitmap);
+        activeCaptureRef.current = null;
       }
     };
-  }, [activeCapture]);
+  }, []);
 
   return (
     <div

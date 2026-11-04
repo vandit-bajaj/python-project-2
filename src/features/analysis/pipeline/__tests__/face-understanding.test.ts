@@ -1,9 +1,13 @@
 import { describe, it, expect, vi } from 'vitest';
-import { runFaceUnderstanding, generateSyntheticLandmarks } from '../face-understanding';
+import {
+  runFaceUnderstanding,
+  generateSyntheticLandmarks,
+  FaceDetectionError,
+} from '../face-understanding';
 import * as imageProcessor from '@/features/capture/lib/image-processor';
 
 describe('Face Understanding Pipeline', () => {
-  it('generates 478 valid normalized landmarks for synthetic fallback', () => {
+  it('generates 478 valid normalized landmarks for synthetic fixtures', () => {
     const landmarks = generateSyntheticLandmarks();
     expect(landmarks.length).toBe(478);
     for (const lm of landmarks) {
@@ -14,7 +18,27 @@ describe('Face Understanding Pipeline', () => {
     }
   });
 
-  it('runs complete face understanding pipeline generating masks and baseline', async () => {
+  it('throws FaceDetectionError when no face landmarks can be detected', async () => {
+    const mockBitmap = {
+      width: 100,
+      height: 100,
+      close: vi.fn(),
+    } as unknown as ImageBitmap;
+
+    const buffer = new Uint8ClampedArray(100 * 100 * 4);
+    const mockImageData = {
+      width: 100,
+      height: 100,
+      data: buffer,
+      colorSpace: 'srgb' as const,
+    } as ImageData;
+
+    vi.spyOn(imageProcessor, 'extractImageDataFromBitmap').mockReturnValue(mockImageData);
+
+    await expect(runFaceUnderstanding(mockBitmap)).rejects.toThrow(FaceDetectionError);
+  });
+
+  it('runs complete face understanding pipeline with supplied landmarks generating masks and baseline', async () => {
     const width = 100;
     const height = 100;
     const mockBitmap = {
@@ -41,7 +65,8 @@ describe('Face Understanding Pipeline', () => {
 
     vi.spyOn(imageProcessor, 'extractImageDataFromBitmap').mockReturnValue(mockImageData);
 
-    const result = await runFaceUnderstanding(mockBitmap);
+    const mockLandmarks = generateSyntheticLandmarks();
+    const result = await runFaceUnderstanding(mockBitmap, { mockLandmarks });
 
     expect(result.landmarks.length).toBe(478);
     expect(result.confidence).toBeGreaterThan(0.5);

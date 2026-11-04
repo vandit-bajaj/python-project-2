@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { Button } from '@/shared/ui/button';
 import { QualityGuidance } from './quality-guidance';
-import { RefreshCcw, Check, ShieldCheck, Sun, Eye } from 'lucide-react';
+import { RefreshCcw, Check, ShieldCheck, Sun, Eye, AlertCircle } from 'lucide-react';
 import type { ProcessedCapture } from '../types';
 
 export interface ImagePreviewProps {
@@ -20,12 +20,16 @@ export function ImagePreview({ capture, onRetake, onConfirm, className }: ImageP
     const canvas = canvasRef.current;
     if (!canvas || !capture.bitmap) return;
 
-    canvas.width = capture.bitmap.width;
-    canvas.height = capture.bitmap.height;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.drawImage(capture.bitmap, 0, 0);
+    try {
+      canvas.width = capture.bitmap.width;
+      canvas.height = capture.bitmap.height;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(capture.bitmap, 0, 0);
+      }
+    } catch {
+      // Ignored in headless/jsdom testing environments
+    }
   }, [capture]);
 
   const { quality } = capture;
@@ -78,6 +82,19 @@ export function ImagePreview({ capture, onRetake, onConfirm, className }: ImageP
           </div>
         </div>
 
+        {/* Quality Gate Status Notice */}
+        {!quality.isAcceptable && (
+          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-rose-500/20 bg-rose-500/10 p-3 text-left text-xs text-rose-700 dark:text-rose-300">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-rose-600 dark:text-rose-400" />
+            <div className="space-y-0.5">
+              <p className="font-semibold">Quality requirements not met</p>
+              <p className="leading-relaxed opacity-90">
+                Photo lighting or focus is insufficient for accurate skin analysis. Please retake following the guidance above.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="mt-6 flex items-center gap-3">
           <Button type="button" variant="outline" className="flex-1 gap-1.5" onClick={onRetake}>
@@ -85,7 +102,12 @@ export function ImagePreview({ capture, onRetake, onConfirm, className }: ImageP
             Retake
           </Button>
 
-          <Button type="button" className="flex-1 gap-1.5" onClick={() => onConfirm(capture)}>
+          <Button
+            type="button"
+            className="flex-1 gap-1.5"
+            disabled={!quality.isAcceptable}
+            onClick={() => onConfirm(capture)}
+          >
             <Check className="h-4 w-4" />
             Analyze
           </Button>

@@ -34,8 +34,23 @@ function getFaceMeshWorker(): Comlink.Remote<FaceMeshWorkerInterface> | null {
   return remoteService;
 }
 
+export class FaceDetectionError extends Error {
+  constructor(
+    public readonly code: 'NO_FACE_DETECTED' | 'WORKER_UNAVAILABLE',
+    message: string,
+  ) {
+    super(message);
+    this.name = 'FaceDetectionError';
+  }
+}
+
+export interface FaceUnderstandingOptions {
+  /** Optional mock landmarks for offline unit testing */
+  mockLandmarks?: NormalizedLandmark[];
+}
+
 /**
- * Creates canonical synthetic face landmarks (478 points) for fallback/testing.
+ * Creates canonical synthetic face landmarks (478 points) for testing fixtures.
  */
 export function generateSyntheticLandmarks(): NormalizedLandmark[] {
   const landmarks: NormalizedLandmark[] = [];
@@ -58,66 +73,92 @@ export function generateSyntheticLandmarks(): NormalizedLandmark[] {
 /**
  * Orchestrates Phase 2 Face Understanding:
  * Landmarks detection -> Zone segmentation -> Skin ROI extraction -> Lighting normalization.
+ * Throws FaceDetectionError if no valid human face is detected.
  */
 export async function runFaceUnderstanding(
   bitmap: ImageBitmap,
+  options?: FaceUnderstandingOptions,
 ): Promise<FaceUnderstandingResult> {
   const width = bitmap.width;
   const height = bitmap.height;
+
+  if (width <= 0 || height <= 0) {
+    throw new FaceDetectionError(
+      'WORKER_UNAVAILABLE',
+      'The provided image buffer has invalid dimensions.',
+    );
+  }
 
   // 1. Extract ImageData from ImageBitmap first while bitmap is in-memory and valid
   let rawImageData: ImageData;
   try {
     rawImageData = extractImageDataFromBitmap(bitmap);
   } catch {
-    const fallbackBuffer = new Uint8ClampedArray(Math.max(1, width * height * 4));
-    fallbackBuffer.fill(200);
-    rawImageData = {
-      width,
-      height,
-      data: fallbackBuffer,
-      colorSpace: 'srgb',
-    } as ImageData;
+    throw new FaceDetectionError(
+      'WORKER_UNAVAILABLE',
+      'Failed to read pixel data from image buffer.',
+    );
   }
 
-  // 2. Run MediaPipe Face Landmarker in Web Worker (with fallback)
-  let landmarks: NormalizedLandmark[] | null = null;
-  let confidence = 0.95;
+  // 2. Run MediaPipe Face Landmarker in Web Worker (or use mock if explicitly provided)
+  let landmarks: NormalizedLandmark[] | null = options?.mockLandmarks ?? null;
+  let confidence = options?.mockLandmarks ? 0.95 : 0.0;
 
-  const worker = getFaceMeshWorker();
-  if (worker) {
-    try {
-      let workerBitmap: ImageBitmap | null = null;
-      if (typeof createImageBitmap !== 'undefined') {
-        try {
-          workerBitmap = await createImageBitmap(bitmap);
-        } catch {
-          // Continue with original bitmap
+  if (!landmarks) {
+    const worker = getFaceMeshWorker();
+    if (worker) {
+      try {
+        // Create an independent ImageBitmap copy for the worker so Comlink structured
+        // cloning never detaches or invalidates the caller's ImageBitmap on the main thread
+        let workerBitmap: ImageBitmap | null = null;
+        if (typeof createImageBitmap !== 'undefined') {
+          try {
+            workerBitmap = await createImageBitmap(bitmap);
+          } catch {
+            // Fallback to canvas clone
+          }
         }
-      }
 
-      const detectResult = await worker.detect(workerBitmap || bitmap);
-      if (detectResult) {
-        landmarks = detectResult.landmarks;
-        confidence = detectResult.confidence;
-      }
-
-      if (workerBitmap) {
-        try {
-          workerBitmap.close();
-        } catch {
-          // Handled
+        if (!workerBitmap && typeof document !== 'undefined') {
+          try {
+            const offscreen = document.createElement('canvas');
+            offscreen.width = width;
+            offscreen.height = height;
+            const ctx = offscreen.getContext('2d');
+            if (ctx) {
+              ctx.drawImage(bitmap, 0, 0);
+              workerBitmap = await createImageBitmap(offscreen);
+            }
+          } catch {
+            // Canvas clone failed
+          }
         }
+
+        if (workerBitmap) {
+          const detectResult = await worker.detect(workerBitmap);
+          if (detectResult) {
+            landmarks = detectResult.landmarks;
+            confidence = detectResult.confidence;
+          }
+
+          try {
+            workerBitmap.close();
+          } catch {
+            // Handled
+          }
+        }
+      } catch {
+        // Worker execution error handled below
       }
-    } catch {
-      // Worker execution error fallback
     }
   }
 
-  // Fallback to synthetic topological mesh if in headless or worker-unsupported environment
+  // Enforce face detection gate: Never fake landmarks on invalid or non-face images
   if (!landmarks || landmarks.length < 468) {
-    landmarks = generateSyntheticLandmarks();
-    confidence = 0.8;
+    throw new FaceDetectionError(
+      'NO_FACE_DETECTED',
+      'No clear human face was detected in the photo. Please ensure your face is well-lit, centered in the frame, and unobstructed.',
+    );
   }
 
   // 3. Segment zones into binary masks
