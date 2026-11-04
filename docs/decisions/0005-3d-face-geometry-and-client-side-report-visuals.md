@@ -46,3 +46,4 @@ Under our Absolute Privacy mandate, zero images, derived biometric meshes, or he
 - 100% client-side rendering with zero server compute or data leakage.
 - Rich, engaging 3D and 2D visualization accessible on desktop and mobile browsers.
 - Satisfies all WCAG AA contrast guidelines with color-blind safe palettes and screen-reader accessible tables.
+

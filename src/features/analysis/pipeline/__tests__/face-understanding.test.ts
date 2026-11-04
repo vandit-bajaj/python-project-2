@@ -58,3 +58,4 @@ describe('Face Understanding Pipeline', () => {
     expect(result.normalizedImageData).toBeDefined();
   });
 });
+

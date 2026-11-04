@@ -42,3 +42,4 @@ describe('Local Report Storage & Memory Purge', () => {
     expect(res).toBeNull();
   });
 });
+

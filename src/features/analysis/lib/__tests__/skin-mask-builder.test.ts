@@ -44,3 +44,4 @@ describe('Skin Mask Builder', () => {
     expect(skinRoi.binaryMask[width * height - 1]).toBe(0);
   });
 });
+

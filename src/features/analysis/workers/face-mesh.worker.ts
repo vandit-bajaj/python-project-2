@@ -105,3 +105,4 @@ export class FaceMeshService {
 }
 
 Comlink.expose(new FaceMeshService());
+

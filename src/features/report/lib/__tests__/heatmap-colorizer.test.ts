@@ -35,3 +35,4 @@ describe('Heatmap Colorizer', () => {
     expect(imgData.data.length).toBe(width * height * 4);
   });
 });
+

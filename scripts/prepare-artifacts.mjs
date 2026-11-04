@@ -49,3 +49,4 @@ ensureModel().catch((err) => {
   console.error('[prepare-artifacts] Error ensuring model:', err.message);
   process.exit(1);
 });
+

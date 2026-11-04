@@ -43,3 +43,4 @@ export const ZONE_LANDMARK_MAP: Record<ZoneId, readonly number[]> = {
   underEyeRight: LANDMARK_INDEXES.underEyeRight,
   jawline: LANDMARK_INDEXES.jawline,
 };
+

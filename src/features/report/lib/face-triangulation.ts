@@ -139,3 +139,4 @@ export function computeFaceTriangulation(landmarks: NormalizedLandmark[]): Uint1
 
   return indices;
 }
+

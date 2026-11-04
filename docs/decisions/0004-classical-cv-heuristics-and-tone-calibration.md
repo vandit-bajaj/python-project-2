@@ -52,3 +52,4 @@ In accordance with Phase 3 specifications and our Zero-Egress rule:
 - Real-time client-side analysis executes in ~30–80 milliseconds, well within our performance target for mobile browsers.
 - Zero server requests, maintaining 100% compliance with our Zero-Egress rule.
 - Eliminates racial and skin-tone bias in scoring through individualized baseline normalization and explicit confidence states.
+

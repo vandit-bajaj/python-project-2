@@ -38,3 +38,4 @@ DermaLens extracts skin wellness insights (redness, acne, oiliness, texture) fro
 - Zero main-thread UI jank during landmark detection and zone segmentation.
 - Robust isolation of valid skin pixels from facial hair, eyes, and lips.
 - Scientifically grounded skin-tone baseline calibration ensures fairness and prevents false positives across Fitzpatrick types I–VI.
+

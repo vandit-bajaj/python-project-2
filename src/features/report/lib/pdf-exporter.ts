@@ -136,3 +136,4 @@ export function exportReportToPDF(report: ComprehensiveSkinReport): void {
 
   doc.save(`dermalens-report-${report.id}.pdf`);
 }
+

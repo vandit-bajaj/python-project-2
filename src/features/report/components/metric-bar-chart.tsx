@@ -80,3 +80,4 @@ export function MetricBarChart({
     </div>
   );
 }
+

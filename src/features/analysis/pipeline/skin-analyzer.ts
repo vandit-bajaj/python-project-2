@@ -105,3 +105,4 @@ export function runComprehensiveSkinAnalysis(
     disclaimer: MEDICAL_DISCLAIMER_TEXT,
   };
 }
+
