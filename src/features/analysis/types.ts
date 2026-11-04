@@ -1,4 +1,4 @@
-import type { NormalizedLandmark, ZoneId, SkinToneBaseline } from '@/shared/types';
+import type { NormalizedLandmark, ZoneId, MetricId, SkinToneBaseline } from '@/shared/types';
 
 export interface FaceMeshResult {
   landmarks: NormalizedLandmark[];
@@ -31,4 +31,25 @@ export interface FaceUnderstandingResult {
   normalizedImageData: ImageData;
   baseline: SkinToneBaseline;
   confidence: number;
+}
+
+export interface MetricScoreSummary {
+  metricId: MetricId;
+  name: string;
+  category: 'clarity' | 'balance' | 'texture' | 'uniformity';
+  score: number; // 0-100
+  confidence: number;
+  perZone: Record<ZoneId, number>;
+  heatmap: Float32Array;
+  summary: string;
+}
+
+export interface ComprehensiveSkinReport {
+  id: string;
+  timestamp: string;
+  overallScore: number;
+  baseline: SkinToneBaseline;
+  metrics: Record<MetricId, MetricScoreSummary>;
+  confidence: number;
+  disclaimer: string;
 }
