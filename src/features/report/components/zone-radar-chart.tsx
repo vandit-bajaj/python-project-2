@@ -27,9 +27,10 @@ export function ZoneRadarChart({
   metricName = 'Skin Metric',
   className = '',
 }: ZoneRadarChartProps) {
-  const size = 300;
+  // Generous 340x340 coordinate space with 95px radius provides ample margin on all sides
+  const size = 340;
   const center = size / 2;
-  const maxRadius = 100;
+  const maxRadius = 95;
   const numAxes = ZONE_IDS.length;
 
   const points = useMemo(() => {
@@ -40,10 +41,16 @@ export function ZoneRadarChart({
       const x = center + r * Math.cos(angle);
       const y = center + r * Math.sin(angle);
 
-      // Label coordinate outside the radius
-      const labelRadius = maxRadius + 22;
+      // Label coordinate comfortably positioned outside the outer grid
+      const labelRadius = maxRadius + 26;
       const lx = center + labelRadius * Math.cos(angle);
       const ly = center + labelRadius * Math.sin(angle);
+
+      // Dynamic text anchor based on angle to avoid edge clipping
+      const cosVal = Math.cos(angle);
+      let textAnchor: 'start' | 'end' | 'middle' = 'middle';
+      if (cosVal > 0.15) textAnchor = 'start';
+      else if (cosVal < -0.15) textAnchor = 'end';
 
       return {
         zoneId,
@@ -53,6 +60,7 @@ export function ZoneRadarChart({
         lx: Math.round(lx * 10) / 10,
         ly: Math.round(ly * 10) / 10,
         label: ZONE_LABELS[zoneId],
+        textAnchor,
       };
     });
   }, [zoneScores, numAxes, center, maxRadius]);
@@ -65,7 +73,7 @@ export function ZoneRadarChart({
     <div className={`flex flex-col items-center ${className}`}>
       <svg
         viewBox={`0 0 ${size} ${size}`}
-        className="h-full w-full max-w-[320px] select-none"
+        className="h-full w-full max-w-[340px] select-none"
         aria-label={`Zone distribution radar chart for ${metricName}`}
         role="img"
       >
@@ -109,8 +117,8 @@ export function ZoneRadarChart({
         {/* Shaded Metric Polygon */}
         <polygon
           points={polygonPath}
-          fill="rgba(13, 148, 136, 0.25)"
-          stroke="#0d9488"
+          fill="rgba(15, 118, 110, 0.2)"
+          stroke="#0f766e"
           strokeWidth="2"
           strokeLinejoin="round"
           className="transition-all duration-300"
@@ -123,7 +131,7 @@ export function ZoneRadarChart({
             cx={p.x}
             cy={p.y}
             r="3.5"
-            fill="#0d9488"
+            fill="#0f766e"
             stroke="#ffffff"
             strokeWidth="1.5"
             className="transition-all"
@@ -132,15 +140,15 @@ export function ZoneRadarChart({
           </circle>
         ))}
 
-        {/* Zone Labels */}
+        {/* Zone Labels with Dynamic Anchor */}
         {points.map((p) => (
           <text
             key={p.zoneId}
             x={p.lx}
             y={p.ly}
-            textAnchor="middle"
+            textAnchor={p.textAnchor}
             dominantBaseline="central"
-            className="fill-[var(--muted-foreground)] text-[9px] font-medium"
+            className="fill-[var(--muted-foreground)] text-[10px] font-medium"
           >
             {p.label}
           </text>
@@ -168,4 +176,3 @@ export function ZoneRadarChart({
     </div>
   );
 }
-

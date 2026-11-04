@@ -1,8 +1,8 @@
 // DermaLens Offline Service Worker
 // Strictly offline asset caching - Zero data transmission
 
-const CACHE_NAME = 'dermalens-v1';
-const STATIC_ASSETS = [
+const CACHE_NAME = 'dermalens-v2';
+const PRECACHE_ASSETS = [
   '/',
   '/scan',
   '/disclaimer',
@@ -15,10 +15,14 @@ const STATIC_ASSETS = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS).catch(() => {
-        // Individual missing asset during initial dev run shouldn't break install
-      });
+    caches.open(CACHE_NAME).then(async (cache) => {
+      for (const asset of PRECACHE_ASSETS) {
+        try {
+          await cache.add(asset);
+        } catch {
+          // Continue caching remaining assets if one is temporarily unavailable
+        }
+      }
     }),
   );
   self.skipWaiting();
@@ -81,4 +85,3 @@ self.addEventListener('fetch', (event) => {
       }),
   );
 });
-

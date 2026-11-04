@@ -77,8 +77,8 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {/* Metric Selector Tabs */}
-      <div className="flex flex-wrap gap-1.5 overflow-x-auto pb-1">
+      {/* Horizontal Swipeable Metric Pill Bar (>=44px touch target) */}
+      <div className="flex gap-2 overflow-x-auto pb-2 pt-1 scroll-smooth touch-pan-x">
         {(Object.keys(report.metrics) as MetricId[]).map((metricId) => {
           const isSelected = selectedMetric === metricId;
           const meta = METRICS_METADATA[metricId];
@@ -89,16 +89,16 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
               key={metricId}
               type="button"
               onClick={() => setSelectedMetric(metricId)}
-              className={`flex items-center gap-2 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+              className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 min-h-[44px] text-xs font-semibold transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-teal-600 text-white shadow-sm ring-2 ring-teal-500/20'
+                  ? 'bg-teal-700 dark:bg-teal-600 text-white shadow-xs'
                   : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:bg-[var(--muted)]/80 hover:text-[var(--foreground)]'
               }`}
             >
               <span>{meta?.name ?? metricId}</span>
               <span
                 className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
-                  isSelected ? 'bg-black/20 text-white' : 'bg-black/5 dark:bg-white/10'
+                  isSelected ? 'bg-black/25 text-white' : 'bg-black/5 dark:bg-white/10'
                 }`}
               >
                 {m?.score}
