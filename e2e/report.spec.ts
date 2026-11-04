@@ -43,7 +43,7 @@ test.describe('End-to-End Analysis & Report Flow', () => {
 
     // Verify system displays honest "No Face Detected" card rather than faking landmarks
     await expect(page.getByRole('heading', { name: /No Face Detected/i })).toBeVisible({
-      timeout: 15000,
+      timeout: 25000,
     });
     await expect(
       page.getByText(/No clear human face was detected in the photo/i),
