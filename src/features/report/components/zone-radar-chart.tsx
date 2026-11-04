@@ -89,7 +89,7 @@ export function ZoneRadarChart({
               fill="none"
               stroke="currentColor"
               strokeDasharray="2, 2"
-              className="text-slate-200 dark:text-slate-800"
+              className="text-[var(--border)]"
               strokeWidth="1"
             />
           );
@@ -108,7 +108,7 @@ export function ZoneRadarChart({
               x2={ax}
               y2={ay}
               stroke="currentColor"
-              className="text-slate-200 dark:text-slate-800"
+              className="text-[var(--border)]"
               strokeWidth="1"
             />
           );
@@ -118,7 +118,7 @@ export function ZoneRadarChart({
         <polygon
           points={polygonPath}
           fill="rgba(15, 118, 110, 0.2)"
-          stroke="#0f766e"
+          stroke="var(--primary)"
           strokeWidth="2"
           strokeLinejoin="round"
           className="transition-all duration-300"
@@ -131,8 +131,8 @@ export function ZoneRadarChart({
             cx={p.x}
             cy={p.y}
             r="3.5"
-            fill="#0f766e"
-            stroke="#ffffff"
+            fill="var(--primary)"
+            stroke="var(--card)"
             strokeWidth="1.5"
             className="transition-all"
           >

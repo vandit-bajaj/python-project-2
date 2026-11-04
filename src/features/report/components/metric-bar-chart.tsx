@@ -21,15 +21,15 @@ export function MetricBarChart({
       {Object.values(metrics).map((m) => {
         const isSelected = selectedMetric === m.metricId;
 
-        // Color-blind safe score bar colors
-        let barColor = 'bg-teal-600';
-        let badgeColor = 'text-teal-700 bg-teal-50 dark:bg-teal-950/50 dark:text-teal-300';
+        // Themed score bar colors
+        let barColor = 'bg-[var(--primary)]';
+        let badgeColor = 'text-[var(--primary)] bg-[var(--primary)]/10';
         if (m.score < 65) {
-          barColor = 'bg-rose-500';
-          badgeColor = 'text-rose-700 bg-rose-50 dark:bg-rose-950/50 dark:text-rose-300';
+          barColor = 'bg-[var(--danger)]';
+          badgeColor = 'text-[var(--danger)] bg-[var(--danger)]/10';
         } else if (m.score < 80) {
-          barColor = 'bg-amber-500';
-          badgeColor = 'text-amber-700 bg-amber-50 dark:bg-amber-950/50 dark:text-amber-300';
+          barColor = 'bg-[var(--warning)]';
+          badgeColor = 'text-[var(--warning)] bg-[var(--warning)]/10';
         }
 
         return (
@@ -38,7 +38,7 @@ export function MetricBarChart({
             onClick={() => onSelectMetric?.(m.metricId)}
             className={`cursor-pointer rounded-xl p-2.5 transition-all ${
               isSelected
-                ? 'bg-teal-50/70 ring-1 ring-teal-500/30 dark:bg-teal-950/30'
+                ? 'bg-[var(--primary)]/10 ring-1 ring-[var(--primary)]/30'
                 : 'hover:bg-[var(--muted)]/50'
             }`}
             role="button"

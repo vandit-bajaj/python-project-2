@@ -101,16 +101,16 @@ export function BeforeAfterSlider({
           className="pointer-events-none absolute bottom-0 top-0 w-0.5 bg-white shadow-[0_0_10px_rgba(0,0,0,0.5)]"
           style={{ left: `${sliderPos}%` }}
         >
-          <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/60 bg-black/80 px-2 py-1 text-[10px] font-bold text-white shadow-md backdrop-blur-sm">
+          <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-[var(--border)] bg-[var(--card)] px-2 py-1 text-[10px] font-bold text-[var(--foreground)] shadow-md backdrop-blur-sm">
             &larr; &rarr;
           </div>
         </div>
 
         {/* Labels */}
-        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+        <div className="pointer-events-none absolute bottom-3 left-3 rounded-lg border border-[var(--border)] bg-[var(--card)]/85 px-2.5 py-1 text-[10px] font-semibold text-[var(--foreground)] backdrop-blur-md shadow-2xs">
           Raw Photo
         </div>
-        <div className="pointer-events-none absolute bottom-3 right-3 rounded-lg bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-md">
+        <div className="pointer-events-none absolute bottom-3 right-3 rounded-lg border border-[var(--border)] bg-[var(--card)]/85 px-2.5 py-1 text-[10px] font-semibold text-[var(--foreground)] backdrop-blur-md shadow-2xs">
           Erythema & Texture
         </div>
       </div>

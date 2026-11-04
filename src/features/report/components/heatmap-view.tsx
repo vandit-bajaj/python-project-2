@@ -91,14 +91,14 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
               onClick={() => setSelectedMetric(metricId)}
               className={`shrink-0 flex items-center gap-2 rounded-xl px-4 py-2.5 min-h-[44px] text-xs font-semibold transition-all cursor-pointer ${
                 isSelected
-                  ? 'bg-teal-700 dark:bg-teal-600 text-white shadow-xs'
+                  ? 'bg-[var(--primary)] text-[var(--primary-foreground)] shadow-xs'
                   : 'bg-[var(--muted)] text-[var(--muted-foreground)] hover:bg-[var(--muted)]/80 hover:text-[var(--foreground)]'
               }`}
             >
               <span>{meta?.name ?? metricId}</span>
               <span
                 className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${
-                  isSelected ? 'bg-black/25 text-white' : 'bg-black/5 dark:bg-white/10'
+                  isSelected ? 'bg-black/20 text-white dark:bg-black/30' : 'bg-black/5 dark:bg-white/10'
                 }`}
               >
                 {m?.score}
@@ -109,7 +109,7 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
       </div>
 
       {/* Main Canvas Container */}
-      <div className="relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-black/95 shadow-inner">
+      <div className="relative aspect-3/4 w-full overflow-hidden rounded-2xl bg-black/95 shadow-inner border border-[var(--border)]">
         {/* Base Photo Canvas */}
         <canvas ref={baseCanvasRef} className="h-full w-full object-contain" />
 
@@ -121,15 +121,15 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
         />
 
         {/* Heatmap Legend */}
-        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-xl bg-black/75 px-3 py-2 text-xs text-white backdrop-blur-md">
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--card)]/85 px-3 py-2 text-xs text-[var(--foreground)] backdrop-blur-md shadow-sm">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-white/70">Low / Calm</span>
+            <span className="text-[10px] text-[var(--muted-foreground)]">Low / Calm</span>
             <div className="h-2.5 w-24 rounded-full bg-gradient-to-r from-cyan-500 via-amber-400 to-rose-600 shadow-sm" />
-            <span className="text-[10px] text-white/70">High Concern</span>
+            <span className="text-[10px] text-[var(--muted-foreground)]">High Concern</span>
           </div>
 
           <div className="flex items-center gap-2">
-            <label htmlFor="heatmap-opacity" className="text-[10px] text-white/70">
+            <label htmlFor="heatmap-opacity" className="text-[10px] text-[var(--muted-foreground)]">
               Opacity:
             </label>
             <input
@@ -140,7 +140,7 @@ export function HeatmapView({ report, faceBitmap, className = '' }: HeatmapViewP
               step="0.05"
               value={opacity}
               onChange={(e) => setOpacity(parseFloat(e.target.value))}
-              className="h-1.5 w-16 cursor-pointer accent-teal-400"
+              className="h-1.5 w-16 cursor-pointer accent-[var(--primary)]"
             />
           </div>
         </div>

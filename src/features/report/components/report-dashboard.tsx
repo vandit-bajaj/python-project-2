@@ -40,9 +40,9 @@ function CircularScoreRing({ score }: { score: number }) {
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (score / 100) * circumference;
 
-  let strokeColor = '#0f766e'; // teal
-  if (score < 50) strokeColor = '#e11d48'; // rose
-  else if (score < 70) strokeColor = '#d97706'; // amber
+  let strokeColor = 'var(--primary)';
+  if (score < 50) strokeColor = 'var(--danger)';
+  else if (score < 70) strokeColor = 'var(--warning)';
 
   return (
     <div className="relative flex items-center justify-center py-2">
@@ -271,11 +271,11 @@ export function ReportDashboard({
               )}
               <div className="flex items-center justify-between">
                 <span className="text-[var(--muted-foreground)]">Analysis Confidence:</span>
-                <span className="font-semibold text-teal-700 dark:text-teal-400">
+                <span className="font-semibold text-[var(--primary)]">
                   {Math.round(report.confidence * 100)}%
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 pt-2 text-[11px] text-teal-700 dark:text-teal-300">
+              <div className="flex items-center gap-1.5 pt-2 text-[11px] text-[var(--primary)]">
                 <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
                 <span>Zero network egress • Analyzed locally</span>
               </div>
@@ -420,7 +420,7 @@ export function ReportDashboard({
                   {/* Subtle Mini Progress Bar */}
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--muted)]">
                     <div
-                      className="h-full rounded-full bg-teal-700 dark:bg-teal-400 transition-all duration-500"
+                      className="h-full rounded-full bg-[var(--primary)] transition-all duration-500"
                       style={{ width: `${scorePercent}%` }}
                     />
                   </div>

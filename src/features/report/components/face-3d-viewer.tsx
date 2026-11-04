@@ -9,6 +9,7 @@ import type { ComprehensiveSkinReport } from '@/features/analysis/types';
 import { computeFaceTriangulation, computeFaceUVs } from '../lib/face-triangulation';
 import { createHeatmapImageData } from '../lib/heatmap-colorizer';
 import { Button } from '@/shared/ui/button';
+import { useTheme } from '@/shared/ui/theme-provider';
 import { Rotate3d, Layers, Eye } from 'lucide-react';
 
 const emptySubscribe = () => () => {};
@@ -126,7 +127,7 @@ function FaceMesh({
       <mesh ref={meshRef} geometry={geometry}>
         <meshStandardMaterial
           map={texture ?? undefined}
-          color={texture ? '#ffffff' : '#0d9488'}
+          color={texture ? '#ffffff' : '#0f766e'}
           roughness={0.55}
           metalness={0.1}
           wireframe={wireframe}
@@ -162,12 +163,15 @@ export function Face3DViewer({
     return computeFaceTriangulation(landmarks);
   }, [landmarks]);
 
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
   if (!isMounted) {
     return (
       <div
-        className={`relative flex aspect-3/4 w-full items-center justify-center overflow-hidden rounded-2xl bg-black/95 ${className}`}
+        className={`relative flex aspect-3/4 w-full items-center justify-center overflow-hidden rounded-2xl bg-[var(--subtle)] dark:bg-black/95 ${className}`}
       >
-        <Rotate3d className="h-8 w-8 animate-spin text-teal-400/60" />
+        <Rotate3d className="h-8 w-8 animate-spin text-[var(--primary)]" />
       </div>
     );
   }
@@ -185,7 +189,7 @@ export function Face3DViewer({
   }
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl bg-black/95 shadow-xl ${className}`}>
+    <div className={`relative overflow-hidden rounded-2xl bg-[var(--subtle)] dark:bg-black/95 border border-[var(--border)] shadow-md ${className}`}>
       {/* 3D Canvas Mount Point */}
       <div
         className="aspect-3/4 w-full cursor-grab active:cursor-grabbing"
@@ -197,9 +201,9 @@ export function Face3DViewer({
           gl={{ antialias: true, alpha: true }}
           dpr={[1, 2]}
         >
-          <ambientLight intensity={0.9} />
-          <directionalLight position={[1, 2, 3]} intensity={0.8} />
-          <directionalLight position={[-1, -1, 2]} intensity={0.3} />
+          <ambientLight intensity={isDark ? 0.9 : 1.1} />
+          <directionalLight position={[1, 2, 3]} intensity={isDark ? 0.8 : 0.9} />
+          <directionalLight position={[-1, -1, 2]} intensity={isDark ? 0.3 : 0.4} />
           <FaceMesh
             landmarks={landmarks}
             indices={indices}
@@ -221,7 +225,7 @@ export function Face3DViewer({
       </div>
 
       {/* Floating 3D Controls */}
-      <div className="absolute top-3 right-3 z-10 flex gap-1.5 rounded-xl bg-black/60 p-1.5 backdrop-blur-md">
+      <div className="absolute top-3 right-3 z-10 flex gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--card)]/85 p-1.5 shadow-sm backdrop-blur-md">
         <Button
           size="sm"
           variant={wireframeMode ? 'default' : 'secondary'}
@@ -242,12 +246,13 @@ export function Face3DViewer({
         </Button>
       </div>
 
-      <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between rounded-xl bg-black/70 px-3 py-2 text-[11px] text-white/80 backdrop-blur-md">
-        <span>Drag or swipe to rotate 3D head mesh</span>
+      <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--card)]/85 px-3 py-2 text-[11px] text-[var(--foreground)] shadow-sm backdrop-blur-md">
+        <span className="text-[var(--muted-foreground)]">Drag or swipe to rotate 3D head mesh</span>
         <select
           value={activeMetric}
+          aria-label="3D metric heatmap selector"
           onChange={(e) => setActiveMetric(e.target.value as MetricId)}
-          className="rounded-lg border border-white/20 bg-black/50 px-2 py-1 text-[11px] text-white focus:outline-none"
+          className="rounded-lg border border-[var(--border)] bg-[var(--card)] px-2 py-1 text-[11px] text-[var(--foreground)] focus:outline-none focus:ring-1 focus:ring-[var(--ring)]"
         >
           <option value="redness">Redness Heatmap</option>
           <option value="acne">Blemishes Heatmap</option>
